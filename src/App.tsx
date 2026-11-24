@@ -17,6 +17,23 @@ export default function App() {
   const [activeSection, setActiveSection] = useState('hero');
 
   useEffect(() => {
+    const canonicalUrl = `${window.location.origin}${window.location.pathname}`;
+    let canonicalEl = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!canonicalEl) {
+      canonicalEl = document.createElement('link');
+      canonicalEl.rel = 'canonical';
+      document.head.appendChild(canonicalEl);
+    }
+    canonicalEl.href = canonicalUrl;
+
+    let ogUrlEl = document.querySelector<HTMLMetaElement>('meta[property="og:url"]');
+    if (!ogUrlEl) {
+      ogUrlEl = document.createElement('meta');
+      ogUrlEl.setAttribute('property', 'og:url');
+      document.head.appendChild(ogUrlEl);
+    }
+    ogUrlEl.content = canonicalUrl;
+
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
         trigger: '#prolog',
