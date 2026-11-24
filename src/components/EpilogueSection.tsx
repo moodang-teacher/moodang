@@ -536,7 +536,7 @@ export default function EpilogueSection() {
       </div>
 
       {/* Full-Viewport Width Container (Minus Clean Outer Edge Padding) */}
-      <div className="relative z-10 w-full min-h-[100dvh] px-6 sm:px-10 md:px-14 lg:px-16 pt-24 sm:pt-28 pb-14 sm:pb-16 flex flex-col justify-between gap-12">
+      <div className="relative z-10 w-full h-full min-h-[100dvh] px-6 sm:px-10 md:px-14 lg:px-16 pt-28 sm:pt-32 md:pt-36 pb-10 sm:pb-12 md:pb-14 flex flex-col justify-between gap-6 sm:gap-8">
         {/* Top Centered Section Header */}
         <div ref={headerRef} className="w-full text-center flex flex-col items-center">
           <p
@@ -553,14 +553,14 @@ export default function EpilogueSection() {
           </h2>
           <p
             data-epilogue-head
-            className="mt-5 font-brush text-[8.5vw] sm:text-[6vw] md:text-[clamp(2.75rem,4.6vw,6.25rem)] font-normal tracking-[0.08em] leading-none whitespace-nowrap text-[#A52A43] drop-shadow-[0_10px_30px_rgba(5,7,10,0.95)]"
+            className="mt-6 font-brush text-[8.5vw] sm:text-[6vw] md:text-[clamp(2.75rem,4.6vw,6.25rem)] font-normal tracking-[0.08em] leading-none whitespace-nowrap text-[#A52A43] drop-shadow-[0_10px_30px_rgba(5,7,10,0.95)]"
           >
             勇往直前
           </p>
         </div>
 
         {/* Monumental Left 2/3 Quote & Subtle Latin Original */}
-        <div className="w-full my-auto text-left">
+        <div className="w-full my-auto pt-2 md:pt-4 text-left">
           <blockquote
             ref={quoteRef}
             className="text-[6.1vw] sm:text-[5vw] md:text-[4.4vw] lg:text-[4.4vw] font-bold leading-[1.32] tracking-[-0.03em] whitespace-nowrap text-[#EAE5DC] drop-shadow-[0_12px_40px_rgba(5,7,10,0.9)]"
@@ -572,7 +572,7 @@ export default function EpilogueSection() {
             용기 있는 가슴으로 불행에 맞서라.
           </blockquote>
 
-          <div ref={latinRef} className="mt-8 sm:mt-10 max-w-[58ch]">
+          <div ref={latinRef} className="mt-6 sm:mt-8 max-w-[58ch]">
             <p className="font-display text-xs sm:text-sm md:text-[15px] font-normal tracking-[0.045em] leading-[1.75] text-[#9E988C]">
               Quocirca vivite fortes, fortiaque adversis opponite pectora rebus.
             </p>

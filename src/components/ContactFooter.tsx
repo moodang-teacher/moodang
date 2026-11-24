@@ -63,8 +63,8 @@ export default function ContactFooter() {
 
         {/* Bottom Copyright */}
         <div className="pt-4 w-full text-center">
-          <p className="font-display text-[17px] sm:text-[18.5px] tracking-[0.06em] text-[#9E988C]">
-            © 2026. moodang-teacher.com
+          <p className="font-display text-[15px] sm:text-[16.5px] tracking-[0.06em] text-[#9E988C]">
+            © {new Date().getFullYear()}. moodang-teacher.com
           </p>
         </div>
       </div>
