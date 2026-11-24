@@ -1,0 +1,6 @@
+{
+  "name": "moodang teacher — Web Designer Portfolio",
+  "description": "웹 디자이너 무당선생(moodang teacher) 개인 포트폴리오 웹사이트",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

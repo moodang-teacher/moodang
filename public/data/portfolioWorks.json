@@ -1,0 +1,492 @@
+[
+  {
+    "id": "index-1",
+    "student": "KwonYongSun (용선)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 5기",
+    "year": "2025",
+    "title": "KwonYongSun Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/Kwon_Yong_Sun.webp",
+    "url": "https://yongddu.github.io/portfolio/"
+  },
+  {
+    "id": "index-2",
+    "student": "KimMunJeong (문정)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 5기",
+    "year": "2025",
+    "title": "KimMunJeong Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/Kim_Mun_Jeong.webp",
+    "url": "https://movonjeong-beep.github.io/portfolio/"
+  },
+  {
+    "id": "index-3",
+    "student": "KimSuHyun (수현)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 5기",
+    "year": "2025",
+    "title": "KimSuHyun Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/Kim_Su_Hyun.webp",
+    "url": "https://tngus555.github.io/portfolio/"
+  },
+  {
+    "id": "index-4",
+    "student": "AhnSungEun (성은)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 5기",
+    "year": "2025",
+    "title": "AhnSungEun Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/Ahn_Sung_Eun.webp",
+    "url": "https://sungeunahn.github.io/potfolio/"
+  },
+  {
+    "id": "index-5",
+    "student": "LeeYuJin (유진)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 5기",
+    "year": "2025",
+    "title": "LeeYuJin Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/LeeYuJin.webp",
+    "url": "https://vixx54-oss.github.io/yujin-portfolio/"
+  },
+  {
+    "id": "index-6",
+    "student": "HeeJeongLee (희정)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 5기",
+    "year": "2025",
+    "title": "HeeJeongLee Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/Hee_Jeong_Lee.webp",
+    "url": "https://lhjeon9.github.io/portfolio/"
+  },
+  {
+    "id": "index-7",
+    "student": "LEEYUNSEUL (윤슬)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 5기",
+    "year": "2025",
+    "title": "LEEYUNSEUL Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/LEEYUNSEUL.webp",
+    "url": "https://liyunsee.github.io/yunseul/"
+  },
+  {
+    "id": "hi4-1",
+    "student": "hongjiwon (지원)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 4기",
+    "year": "2024",
+    "title": "hongjiwon Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/hongjiwon.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-4th/hongjiwon"
+  },
+  {
+    "id": "hi4-2",
+    "student": "yegahyueon (가현)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 4기",
+    "year": "2024",
+    "title": "yegahyueon Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/yegahyueon.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-4th/yegahyueon"
+  },
+  {
+    "id": "hi4-3",
+    "student": "kimjungyup (정엽)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 4기",
+    "year": "2024",
+    "title": "kimjungyup Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/kimjungyup.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-4th/kimjungyup"
+  },
+  {
+    "id": "hi4-4",
+    "student": "parkseolhee (설희)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 4기",
+    "year": "2024",
+    "title": "parkseolhee Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/parkseolhee.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-4th/parkseolhee"
+  },
+  {
+    "id": "hi4-5",
+    "student": "moonjiwon (지원)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 4기",
+    "year": "2024",
+    "title": "moonjiwon Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/moonjiwon.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-4th/moonjiwon"
+  },
+  {
+    "id": "hi4-6",
+    "student": "yooeunwoo (은우)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 4기",
+    "year": "2024",
+    "title": "yooeunwoo Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/yooeunwoo.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-4th/yooeunwoo"
+  },
+  {
+    "id": "hi4-7",
+    "student": "jungheejoo (희주)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 4기",
+    "year": "2024",
+    "title": "jungheejoo Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/jungheejoo.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-4th/jungheejoo"
+  },
+  {
+    "id": "hi4-8",
+    "student": "hajimin (지민)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 4기",
+    "year": "2024",
+    "title": "hajimin Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/hajimin.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-4th/hajimin"
+  },
+  {
+    "id": "hi3-1",
+    "student": "hajiyeong (지영)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 3기",
+    "year": "2024",
+    "title": "hajiyeong Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/hajiyeong.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-3rd/hajiyeong/"
+  },
+  {
+    "id": "hi3-2",
+    "student": "hwangminkyoung (민경)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 3기",
+    "year": "2024",
+    "title": "hwangminkyoung Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/hwangminkyoung.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-3rd/hwangminkyoung/"
+  },
+  {
+    "id": "hi3-3",
+    "student": "kimeunso (은소)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 3기",
+    "year": "2024",
+    "title": "kimeunso Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/kimeunso.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-3rd/kimeunso/"
+  },
+  {
+    "id": "hi3-4",
+    "student": "kimsoobin (수빈)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 3기",
+    "year": "2024",
+    "title": "kimsoobin Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/kimsoobin.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-3rd/kimsoobin/"
+  },
+  {
+    "id": "hi3-5",
+    "student": "leeminseo (민서)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 3기",
+    "year": "2024",
+    "title": "leeminseo Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/leeminseo.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-3rd/leeminseo/"
+  },
+  {
+    "id": "hi3-6",
+    "student": "limjooeun (주은)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 3기",
+    "year": "2024",
+    "title": "limjooeun Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/limjooeun.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-3rd/limjooeun/"
+  },
+  {
+    "id": "hi3-7",
+    "student": "ryusola (솔아)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 3기",
+    "year": "2024",
+    "title": "ryusola Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/ryusola.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-3rd/sola/"
+  },
+  {
+    "id": "hi3-8",
+    "student": "songhyun (현)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 3기",
+    "year": "2024",
+    "title": "songhyun Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/songhyun.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-3rd/songhyun/"
+  },
+  {
+    "id": "hi2-1",
+    "student": "kimjinyoung (진영)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 2기",
+    "year": "2023",
+    "title": "kimjinyoung Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/kimjinyoung.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-2nd/kimjinyoung/"
+  },
+  {
+    "id": "hi2-2",
+    "student": "kobongkwan (봉관)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 2기",
+    "year": "2023",
+    "title": "kobongkwan Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/kobongkwan.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-2nd/kobongkwan/"
+  },
+  {
+    "id": "hi2-3",
+    "student": "kwonjimin (지민)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 2기",
+    "year": "2023",
+    "title": "kwonjimin Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/kwonjimin.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-2nd/kwonjimin/"
+  },
+  {
+    "id": "hi2-4",
+    "student": "kimnayoung (나영)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 2기",
+    "year": "2023",
+    "title": "kimnayoung Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/kimnayoung.webp",
+    "url": "https://nanan0na.github.io/portfolio/"
+  },
+  {
+    "id": "hi2-5",
+    "student": "yangjungeun (정은)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 2기",
+    "year": "2023",
+    "title": "yangjungeun Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/yangjungeun.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-2nd/yangjungeun/"
+  },
+  {
+    "id": "hi2-6",
+    "student": "yoonhyeon (현)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 2기",
+    "year": "2023",
+    "title": "yoonhyeon Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/yoonhyeon.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-2nd/yoonhyeon/"
+  },
+  {
+    "id": "hi1-1",
+    "student": "kimkiyoung (기영)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 1기",
+    "year": "2023",
+    "title": "kimkiyoung Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/kimkiyoung.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-1st/kimkiyoung/"
+  },
+  {
+    "id": "hi1-2",
+    "student": "kimsehee (세희)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 1기",
+    "year": "2023",
+    "title": "kimsehee Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/kimsehee.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-1st/kimsehee/"
+  },
+  {
+    "id": "hi1-3",
+    "student": "kimyeojin (여진)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 1기",
+    "year": "2023",
+    "title": "kimyeojin Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/kimyeojin.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-1st/kimyeojin/"
+  },
+  {
+    "id": "hi1-4",
+    "student": "leeyunhee (윤희)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 1기",
+    "year": "2023",
+    "title": "leeyunhee Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/leeyunhee.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-1st/leeyunhee/"
+  },
+  {
+    "id": "hi1-5",
+    "student": "parkhana (하나)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 1기",
+    "year": "2023",
+    "title": "parkhana Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/parkhana.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-1st/parkhana/"
+  },
+  {
+    "id": "hi1-6",
+    "student": "parkinjung (인정)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 1기",
+    "year": "2023",
+    "title": "parkinjung Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/parkinjung.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-1st/parkinjung/"
+  },
+  {
+    "id": "hi1-7",
+    "student": "parkyoungmin (영민)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 1기",
+    "year": "2023",
+    "title": "parkyoungmin Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/parkyoungmin.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-1st/parkyoungmin/"
+  },
+  {
+    "id": "hi1-8",
+    "student": "seoseongeun (성은)",
+    "academy": "하이미디어 아카데미",
+    "cohort": "하이미디어 1기",
+    "year": "2023",
+    "title": "seoseongeun Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/seoseongeun.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/hi-1st/seoseongeun/"
+  },
+  {
+    "id": "reve4-1",
+    "student": "hongyura (유라)",
+    "academy": "레브아트 일산",
+    "cohort": "레브아트 4기",
+    "year": "2022",
+    "title": "hongyura Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/hongyura.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/reve-4th/hongyura/"
+  },
+  {
+    "id": "reve4-2",
+    "student": "jeonmin (민)",
+    "academy": "레브아트 일산",
+    "cohort": "레브아트 4기",
+    "year": "2022",
+    "title": "jeonmin Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/jeonmin.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/reve-4th/jeonmin/"
+  },
+  {
+    "id": "reve4-3",
+    "student": "johyunwoo (현우)",
+    "academy": "레브아트 일산",
+    "cohort": "레브아트 4기",
+    "year": "2022",
+    "title": "johyunwoo Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/johyunwoo.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/reve-4th/johyunwoo/"
+  },
+  {
+    "id": "reve4-4",
+    "student": "kimwonkyoung (원경)",
+    "academy": "레브아트 일산",
+    "cohort": "레브아트 4기",
+    "year": "2022",
+    "title": "kimwonkyoung Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/kimwonkyoung.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/reve-4th/kimwonkyoung/"
+  },
+  {
+    "id": "reve4-5",
+    "student": "leeeunmi (은미)",
+    "academy": "레브아트 일산",
+    "cohort": "레브아트 4기",
+    "year": "2022",
+    "title": "leeeunmi Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/leeeunmi.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/reve-4th/leeeunmi/"
+  },
+  {
+    "id": "reve4-6",
+    "student": "leeserom (새롬)",
+    "academy": "레브아트 일산",
+    "cohort": "레브아트 4기",
+    "year": "2022",
+    "title": "leeserom Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/leeserom.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/reve-4th/leeserom/"
+  },
+  {
+    "id": "reve4-7",
+    "student": "shinjieun (지은)",
+    "academy": "레브아트 일산",
+    "cohort": "레브아트 4기",
+    "year": "2022",
+    "title": "shinjieun Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/shinjieun.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/reve-4th/shinjieun/"
+  },
+  {
+    "id": "reve3-1",
+    "student": "kimdahee (다희)",
+    "academy": "레브아트 일산",
+    "cohort": "레브아트 3기",
+    "year": "2022",
+    "title": "kimdahee Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/kimdahee.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/reve-3rd/kimdahee/"
+  },
+  {
+    "id": "reve3-2",
+    "student": "kimjungwoo (정우)",
+    "academy": "레브아트 일산",
+    "cohort": "레브아트 3기",
+    "year": "2022",
+    "title": "kimjungwoo Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/kimjungwoo.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/reve-3rd/kimjungwoo/"
+  },
+  {
+    "id": "reve3-3",
+    "student": "kimminji (민지)",
+    "academy": "레브아트 일산",
+    "cohort": "레브아트 3기",
+    "year": "2022",
+    "title": "kimminji Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/kimminji.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/reve-3rd/kimminji/"
+  },
+  {
+    "id": "reve3-4",
+    "student": "kimsoojin (수진)",
+    "academy": "레브아트 일산",
+    "cohort": "레브아트 3기",
+    "year": "2022",
+    "title": "kimsoojin Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/kimsoojin.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/reve-3rd/kimsoojin/"
+  },
+  {
+    "id": "reve3-5",
+    "student": "parkseolha (설하)",
+    "academy": "레브아트 일산",
+    "cohort": "레브아트 3기",
+    "year": "2022",
+    "title": "parkseolha Portfolio",
+    "image": "https://moodang-teacher.github.io/hall_of_fame/img/parkseolha.webp",
+    "url": "https://moodang-teacher.github.io/my-fingers/reve-3rd/parkseolha/"
+  }
+]
