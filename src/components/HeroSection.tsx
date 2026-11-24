@@ -13,14 +13,14 @@ interface HeroSectionProps {
 const HERO_VIDEO_SRC =
   '/assets/aistudio/Man_and_bull_standing_together_2ce14f77_6df9eff4.mp4';
 
-const MONOGRAM_CHARS = ['m', 'o', 'o', 'd', 'a', 'n', 'g'];
+const SLOGAN_WORDS = ['깨끗하게,', '맑게,', '자신있게!'];
 
 export default function HeroSection({ onExplore }: HeroSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const preloaderRef = useRef<HTMLDivElement>(null);
   const lockupRef = useRef<HTMLDivElement>(null);
   const svgLogoRef = useRef<SVGSVGElement>(null);
-  const monogramRef = useRef<HTMLDivElement>(null);
+  const sloganRef = useRef<HTMLDivElement>(null);
   const portalStageRef = useRef<HTMLDivElement>(null);
   const mediaWrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -50,7 +50,7 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
 
       const ctx = gsap.context(() => {
         const logoPaths = svgLogoRef.current?.querySelectorAll('path');
-        const letters = monogramRef.current?.querySelectorAll('[data-mono-char]');
+        const words = sloganRef.current?.querySelectorAll('[data-slogan-word]');
         const revealItems = contentRef.current?.querySelectorAll('[data-hero-reveal]');
 
         // Initial hidden states before timeline starts
@@ -82,7 +82,7 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
 
         const tl = gsap.timeline();
 
-        // Phase 1: SVG Seal Logo line-drawing + single-line "moodang" underneath on Black Navy
+        // Phase 1: SVG Seal Logo line-drawing + word-by-word "깨끗하게, 맑게, 자신있게!" underneath on Black Navy
         if (logoPaths && logoPaths.length > 0) {
           logoPaths.forEach((path) => {
             const len = path.getTotalLength();
@@ -111,19 +111,19 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
           );
         }
 
-        if (letters && letters.length > 0) {
-          gsap.set(letters, { opacity: 0, y: 10 });
+        if (words && words.length > 0) {
+          gsap.set(words, { opacity: 0, y: 12 });
 
           tl.to(
-            letters,
+            words,
             {
               opacity: 1,
               y: 0,
-              duration: 0.45,
-              stagger: 0.045,
+              duration: 0.42,
+              stagger: 0.24,
               ease: 'power3.out',
             },
-            0.35
+            0.3
           );
         }
 
@@ -537,7 +537,7 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
       ref={sectionRef}
       className="sticky top-0 z-10 isolate h-screen min-h-[100dvh] w-full overflow-hidden bg-[#0C121B] flex flex-col justify-between"
     >
-      {/* Preloader Curtain Overlay: Drawing SVG Seal + Single-Line "moodang" */}
+      {/* Preloader Curtain Overlay: Drawing SVG Seal + Word-by-Word Slogan */}
       <div
         ref={preloaderRef}
         aria-hidden="true"
@@ -566,12 +566,12 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
           </svg>
 
           <div
-            ref={monogramRef}
-            className="font-display font-medium text-[#D7D0C3] select-none flex items-center justify-center whitespace-nowrap text-sm sm:text-base leading-none tracking-[0.42em] pl-[0.42em]"
+            ref={sloganRef}
+            className="font-medium text-[#D7D0C3] select-none flex items-center justify-center gap-2 sm:gap-2.5 whitespace-nowrap text-sm sm:text-base leading-none tracking-[0.06em]"
           >
-            {MONOGRAM_CHARS.map((char, index) => (
-              <span key={index} data-mono-char className="inline-block">
-                {char}
+            {SLOGAN_WORDS.map((word, index) => (
+              <span key={index} data-slogan-word className="inline-block">
+                {word}
               </span>
             ))}
           </div>

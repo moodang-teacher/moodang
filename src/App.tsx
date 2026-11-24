@@ -152,7 +152,8 @@ export default function App() {
 
       <SkullTop
         visible={activeSection !== 'hero'}
-        onScrollToTop={() => handleNavigate('hero')}
+        activeSection={activeSection}
+        onNavigate={handleNavigate}
       />
     </div>
   );

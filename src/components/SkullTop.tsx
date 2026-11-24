@@ -3,20 +3,44 @@ import gsap from 'gsap';
 
 const SKULL_ACTIVE_SRC = '/assets/aistudio/skull-active_da855264.png';
 
+const MENU_SECTIONS = [
+  'prolog',
+  'about',
+  'works',
+  'portfolio',
+  'epilogue',
+  'contact',
+] as const;
+
 interface SkullTopProps {
   visible: boolean;
-  onScrollToTop: () => void;
+  activeSection: string;
+  onNavigate: (sectionId: string) => void;
 }
 
-export default function SkullTop({ visible, onScrollToTop }: SkullTopProps) {
+export default function SkullTop({
+  visible,
+  activeSection,
+  onNavigate,
+}: SkullTopProps) {
   const buttonRef = useRef<HTMLAnchorElement>(null);
   const bubbleRef = useRef<HTMLParagraphElement>(null);
   const [isPaused, setIsPaused] = useState(false);
   const isLaunchingRef = useRef(false);
   const visibleRef = useRef(visible);
   visibleRef.current = visible;
+  const activeSectionRef = useRef(activeSection);
+  activeSectionRef.current = activeSection;
   const launchTlRef = useRef<gsap.core.Timeline | null>(null);
   const hoverTweenRef = useRef<gsap.core.Tween | null>(null);
+
+  const pickRandomMenu = () => {
+    const candidates = MENU_SECTIONS.filter(
+      (id) => id !== activeSectionRef.current
+    );
+    const pool = candidates.length > 0 ? candidates : MENU_SECTIONS;
+    return pool[Math.floor(Math.random() * pool.length)];
+  };
 
   useEffect(() => {
     const btnEl = buttonRef.current;
@@ -88,7 +112,7 @@ export default function SkullTop({ visible, onScrollToTop }: SkullTopProps) {
     if (!btnEl || isLaunchingRef.current) return;
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      onScrollToTop();
+      onNavigate(pickRandomMenu());
       return;
     }
 
@@ -141,10 +165,10 @@ export default function SkullTop({ visible, onScrollToTop }: SkullTopProps) {
       ease: 'power2.in',
     });
 
-    // 3. Hide once exited above viewport & trigger smooth scroll to top at ~500ms
+    // 3. Hide once exited above viewport & trigger smooth scroll to a random menu at ~500ms
     tl.set(btnEl, { opacity: 0, pointerEvents: 'none' });
     tl.call(() => {
-      onScrollToTop();
+      onNavigate(pickRandomMenu());
     }, undefined, 0.5);
 
     // Wait for smooth scroll completion before resetting resting state
@@ -163,8 +187,8 @@ export default function SkullTop({ visible, onScrollToTop }: SkullTopProps) {
 
       <a
         ref={buttonRef}
-        href="#hero"
-        aria-label="맨 위로 이동"
+        href="#prolog"
+        aria-label="랜덤 메뉴로 이동"
         onClick={handleClick}
         onMouseEnter={showBubble}
         onMouseLeave={hideBubble}
