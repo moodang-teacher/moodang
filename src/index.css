@@ -28,6 +28,46 @@
   }
 }
 
+/* Custom Brand Scrollbar — Black Navy Channel & Tactile Crimson Thumb */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080B10;
+  border-left: 1px solid rgba(215, 208, 195, 0.06);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(165, 42, 67, 0.76) 0%,
+    rgba(140, 34, 56, 0.92) 100%
+  );
+  border: 2px solid #080B10;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A52A43;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #C43753;
+}
+
+::-webkit-scrollbar-corner {
+  background: #080B10;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #A52A43 #080B10;
+  }
+}
+
 .font-display {
   font-family: var(--font-display);
 }
@@ -64,12 +104,34 @@
   animation: skull-spin 10s linear infinite;
 }
 
+@keyframes contact-marquee-left {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.contact-marquee-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: contact-marquee-left 11s linear infinite;
+}
+
+.contact-marquee-wrap:hover .contact-marquee-track,
+.contact-marquee-wrap:focus-visible .contact-marquee-track {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
   .cinema-grain,
-  .skull-spin {
+  .skull-spin,
+  .contact-marquee-track {
     animation: none;
   }
 }
