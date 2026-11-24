@@ -72,6 +72,7 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
   const desiredProgressRef = useRef(0);
   const isSeekingRef = useRef(false);
   const seekFallbackRef = useRef<number | null>(null);
+  const hasPrimedRef = useRef(false);
   const isSectionActiveRef = useRef(false);
   const isDestroyedRef = useRef(false);
 
@@ -97,7 +98,7 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
       return;
     }
 
-    if (isSeekingRef.current && videoEl.seeking && !force) return;
+    if (videoEl.seeking || isSeekingRef.current) return;
 
     isSeekingRef.current = true;
     if (seekFallbackRef.current !== null) {
@@ -106,12 +107,14 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
     seekFallbackRef.current = window.setTimeout(() => {
       isSeekingRef.current = false;
       const latestEl = videoRef.current;
-      if (!latestEl || isDestroyedRef.current || latestEl.readyState < 1) return;
+      if (!latestEl || isDestroyedRef.current || latestEl.readyState < 1 || latestEl.seeking) {
+        return;
+      }
       const latestTarget = getClampedTargetTime(latestEl);
       if (Math.abs(latestEl.currentTime - latestTarget) > 0.025) {
-        latestEl.currentTime = latestTarget;
+        flushVideoSeek(true);
       }
-    }, 100);
+    }, 420);
 
     try {
       videoEl.currentTime = targetTime;
@@ -120,8 +123,32 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
     }
   };
 
+  const primeVideoDecoder = () => {
+    const videoEl = videoRef.current;
+    if (!videoEl || hasPrimedRef.current || isDestroyedRef.current) return;
+    if (videoEl.readyState < 2) return;
+    hasPrimedRef.current = true;
+
+    const playPromise = videoEl.play();
+    if (playPromise && typeof playPromise.then === 'function') {
+      playPromise
+        .then(() => {
+          if (isDestroyedRef.current) return;
+          videoEl.pause();
+          isSeekingRef.current = false;
+          flushVideoSeek(true);
+        })
+        .catch(() => {
+          // Autoplay priming blocked; direct seeking still updates frames
+        });
+    } else {
+      videoEl.pause();
+    }
+  };
+
   useEffect(() => {
     isDestroyedRef.current = false;
+    hasPrimedRef.current = false;
     const videoEl = videoRef.current;
     if (!videoEl) return;
 
@@ -597,7 +624,11 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
             onUpdate: () => {
               const p = Math.max(0, Math.min(1, scrubProxy.progress));
               desiredProgressRef.current = p;
-              isSectionActiveRef.current = p > 0.01;
+              const nowActive = p > 0.01;
+              if (nowActive && !hasPrimedRef.current) {
+                primeVideoDecoder();
+              }
+              isSectionActiveRef.current = nowActive;
               flushVideoSeek();
 
               const isNowFullscreen = p >= 0.168;
