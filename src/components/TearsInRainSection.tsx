@@ -2,6 +2,7 @@ import { useEffect, useImperativeHandle, useRef, type Ref } from 'react';
 import gsap from 'gsap';
 
 const TEARS_VIDEO_SRC = '/assets/aistudio/Time_to_Die_scrub.mp4';
+const MOBILE_TEARS_VIDEO_SRC = '/assets/aistudio/Time_to_Die_mobile.mp4';
 const FALLBACK_VIDEO_DURATION = 50.633917;
 
 const TEARS_LINES = [
@@ -124,6 +125,23 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
     let lastSeekAt = -Infinity;
     let hasPrimed = false;
     let disposed = false;
+    const attachSource = () => {
+      if (!videoEl.hasAttribute('src')) {
+        videoEl.src = touchInput.matches ? MOBILE_TEARS_VIDEO_SRC : TEARS_VIDEO_SRC;
+      }
+    };
+    const stageObserver = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        attachSource();
+      } else if (touchInput.matches && videoEl.hasAttribute('src')) {
+        cancelPendingSeek();
+        videoEl.pause();
+        videoEl.removeAttribute('src');
+        videoEl.load();
+        hasPrimed = false;
+      }
+    });
+    if (sectionRef.current) stageObserver.observe(sectionRef.current);
 
     const flushVideoSeek = () => {
       if (disposed || !isSceneVisibleRef.current || videoEl.readyState < 1 || videoEl.seeking) {
@@ -156,6 +174,7 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
 
     const syncVideo = () => {
       if (!isSceneVisibleRef.current) return;
+      attachSource();
       if (videoEl.preload !== 'auto') videoEl.preload = 'auto';
       if (!hasPrimed && desiredProgressRef.current > 0.01 && videoEl.readyState >= 2) {
         hasPrimed = true;
@@ -181,6 +200,7 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
 
     return () => {
       disposed = true;
+      stageObserver.disconnect();
       cancelPendingSeek();
       videoEl.pause();
       syncVideoRef.current = () => {};
@@ -719,7 +739,6 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
               >
                 <video
                   ref={videoRef}
-                  src={TEARS_VIDEO_SRC}
                   muted
                   playsInline
                   preload="metadata"

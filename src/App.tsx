@@ -12,6 +12,7 @@ import ContactFooter from './components/ContactFooter';
 import SkullTop from './components/SkullTop';
 
 gsap.registerPlugin(ScrollTrigger);
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 export default function App() {
   const [activeSection, setActiveSection] = useState('hero');
@@ -132,7 +133,8 @@ export default function App() {
       } else if (sectionId === 'about') {
         window.scrollTo({ top: topY + 20, behavior: 'smooth' });
       } else if (sectionId === 'tears_in_rain') {
-        window.scrollTo({ top: topY + 3500, behavior: 'smooth' });
+        const tearsY = ScrollTrigger.getById('about-sequence')?.labelToScroll('tears');
+        window.scrollTo({ top: tearsY ?? topY, behavior: 'smooth' });
       } else if (sectionId === 'portfolio') {
         window.scrollTo({ top: topY + 10, behavior: 'smooth' });
       } else if (sectionId === 'epilogue') {

@@ -225,7 +225,7 @@ export default function PrologSection() {
           className="absolute inset-y-0 -left-[18%] w-[132%] z-0 pointer-events-none will-change-[transform,opacity]"
         >
           <img
-            src="/assets/aistudio/prologue-skull-wall-end-frame_b5358ad2.png"
+            src="/assets/aistudio/prologue-skull-wall-end-frame_b5358ad2.webp"
             alt=""
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover object-right mix-blend-lighten brightness-[0.92] contrast-[1.08]"
@@ -249,7 +249,7 @@ export default function PrologSection() {
           className="absolute right-[4%] top-[16%] w-[70%] md:w-[52%] z-[6] pointer-events-none will-change-transform opacity-60 mix-blend-screen"
         >
           <img
-            src="/assets/aistudio/smoke-prolog1_fb53e7b1.png"
+            src="/assets/aistudio/smoke-prolog1_fb53e7b1.webp"
             alt=""
             referrerPolicy="no-referrer"
             className="w-full h-auto"
@@ -262,7 +262,7 @@ export default function PrologSection() {
           className="absolute left-[-6%] bottom-[12%] w-[75%] md:w-[54%] z-[7] pointer-events-none will-change-transform opacity-55 mix-blend-screen"
         >
           <img
-            src="/assets/aistudio/smoke-prolog2_8e825771.png"
+            src="/assets/aistudio/smoke-prolog2_8e825771.webp"
             alt=""
             referrerPolicy="no-referrer"
             className="w-full h-auto"
@@ -275,7 +275,7 @@ export default function PrologSection() {
           className="absolute right-[12%] bottom-[20%] w-[65%] md:w-[46%] z-[8] pointer-events-none will-change-transform opacity-50 mix-blend-screen"
         >
           <img
-            src="/assets/aistudio/smoke-prolog3_33ebf60f.png"
+            src="/assets/aistudio/smoke-prolog3_33ebf60f.webp"
             alt=""
             referrerPolicy="no-referrer"
             className="w-full h-auto"

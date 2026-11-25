@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import gsap from 'gsap';
 
-const SKULL_ACTIVE_SRC = '/assets/aistudio/skull-active_da855264.png';
+const SKULL_ACTIVE_SRC = '/assets/aistudio/skull-active_da855264.webp';
 
 const MENU_SECTIONS = [
   'prolog',

@@ -6,7 +6,7 @@ import HanjaArtwork from './HanjaArtwork';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
-const HORATIUS_BUST_SRC = '/assets/aistudio/______00386154.png';
+const HORATIUS_BUST_SRC = '/assets/aistudio/______00386154.webp';
 
 const ASCII_RAMP = ' .,:;-=+*#%@';
 const SCRAMBLE_GLYPHS = '01/\\|_+=*#%@<>';
@@ -185,7 +185,7 @@ export default function EpilogueSection() {
     if (!offCtx) return;
 
     let disposed = false;
-    let isVisible = true;
+    let isVisible = false;
     let rafId: number | null = null;
     let imageLoaded = false;
 
@@ -209,7 +209,7 @@ export default function EpilogueSection() {
     img.referrerPolicy = 'no-referrer';
 
     const buildGrid = () => {
-      if (!imageLoaded || disposed) return;
+      if (!imageLoaded || disposed || !isVisible) return;
 
       stageW = Math.max(stageEl.clientWidth, 1);
       stageH = Math.max(stageEl.clientHeight, 1);
@@ -433,7 +433,7 @@ export default function EpilogueSection() {
     };
 
     const scheduleDraw = () => {
-      if (disposed || rafId !== null) return;
+      if (disposed || !isVisible || rafId !== null) return;
       rafId = requestAnimationFrame(drawFrame);
     };
 
@@ -449,8 +449,6 @@ export default function EpilogueSection() {
       if (disposed) return;
       setImgFailed(true);
     };
-
-    img.src = HORATIUS_BUST_SRC;
 
     const onPointerMove = (e: PointerEvent) => {
       if (reducedMotion || !grid) return;
@@ -484,7 +482,10 @@ export default function EpilogueSection() {
     const intersectionObserver = new IntersectionObserver(
       (entries) => {
         isVisible = entries[0]?.isIntersecting ?? true;
-        if (isVisible && imageLoaded) {
+        if (isVisible && !img.hasAttribute('src')) {
+          img.src = HORATIUS_BUST_SRC;
+        } else if (isVisible && imageLoaded) {
+          buildGrid();
           scheduleDraw();
         }
       },

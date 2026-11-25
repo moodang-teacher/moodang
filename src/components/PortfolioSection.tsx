@@ -118,7 +118,13 @@ export default function PortfolioSection() {
   const [works, setWorks] = useState<CurvedArtwork[]>([]);
   const [selectedWork, setSelectedWork] = useState<CurvedArtwork | null>(null);
   const [hoveredWork, setHoveredWork] = useState<CurvedArtwork | null>(null);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(
+    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+  const [webglFailed, setWebglFailed] = useState(false);
+  const [galleryNearby, setGalleryNearby] = useState(false);
+  const useGrid = prefersReducedMotion || webglFailed;
+  const galleryProgressRef = useRef(0);
 
   const selectedWorkRef = useRef<CurvedArtwork | null>(null);
   selectedWorkRef.current = selectedWork;
@@ -188,17 +194,133 @@ export default function PortfolioSection() {
   );
 
   useEffect(() => {
-    if (prefersReducedMotion || works.length === 0) return;
-
     const stageEl = stageRef.current;
-    const hostEl = canvasHostRef.current;
+    if (!stageEl || works.length === 0) return;
+    if (useGrid) {
+      ScrollTrigger.refresh();
+      return;
+    }
     const foyerEl = foyerRef.current;
     const quotePanelEl = quotePanelRef.current;
     const quoteTextEl = quoteTextRef.current;
     const quoteCtaEl = quoteCtaRef.current;
     const hudEl = hudRef.current;
     const progressBarEl = progressBarRef.current;
-    if (!stageEl || !hostEl) return;
+
+    const scrollDistance = Math.max(5800, works.length * 165);
+    let quoteSplit: SplitText | null = null;
+    const ctx = gsap.context(() => {
+      let quoteTl: gsap.core.Timeline | null = null;
+      let quoteRevealed = false;
+
+      if (quotePanelEl && quoteTextEl) {
+        quoteSplit = SplitText.create(quoteTextEl, {
+          type: 'lines,words,chars',
+          mask: 'lines',
+          linesClass: 'pb-[0.06em]',
+        });
+
+        gsap.set(quotePanelEl, { autoAlpha: 0, pointerEvents: 'none' });
+        gsap.set(quoteSplit.chars, { yPercent: 112, opacity: 0 });
+        if (quoteCtaEl) {
+          gsap.set(quoteCtaEl, { y: 14, opacity: 0 });
+        }
+
+        quoteTl = gsap.timeline({ paused: true });
+        quoteTl
+          .set(quotePanelEl, { autoAlpha: 1, pointerEvents: 'auto' })
+          .to(quoteSplit.chars, {
+            yPercent: 0,
+            opacity: 1,
+            duration: 0.78,
+            stagger: 0.02,
+            ease: 'power3.out',
+          });
+
+        if (quoteCtaEl) {
+          quoteTl.to(
+            quoteCtaEl,
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.65,
+              ease: 'power3.out',
+            },
+            '-=0.42'
+          );
+        }
+      }
+
+      ScrollTrigger.create({
+        trigger: stageEl,
+        start: 'top top',
+        end: `+=${scrollDistance}`,
+        pin: true,
+        pinSpacing: true,
+        scrub: 0.75,
+        anticipatePin: 1,
+        refreshPriority: 20,
+        onUpdate: (self) => {
+          const scrollProgress = self.progress;
+          galleryProgressRef.current = scrollProgress;
+
+          if (foyerEl) {
+            const foyerProgress = THREE.MathUtils.clamp(scrollProgress / 0.1, 0, 1);
+            gsap.set(foyerEl, {
+              opacity: 1 - foyerProgress,
+              y: -36 * foyerProgress,
+            });
+          }
+
+          // Trigger standalone SplitText entrance once reaching the gallery zone (independent of scroll speed)
+          if (quoteTl) {
+            if (!quoteRevealed && scrollProgress >= 0.08) {
+              quoteRevealed = true;
+              quoteTl.timeScale(1).play();
+            } else if (quoteRevealed && scrollProgress < 0.035) {
+              quoteRevealed = false;
+              quoteTl.timeScale(1.6).reverse();
+            }
+          }
+
+          if (hudEl) {
+            const hudAlpha = THREE.MathUtils.clamp(0.75 + scrollProgress * 2.5, 0.75, 1);
+            hudEl.style.opacity = String(hudAlpha);
+          }
+
+          if (progressBarEl) {
+            progressBarEl.style.width = `${Math.max(3, scrollProgress * 100)}%`;
+          }
+
+          requestRenderRef.current?.();
+        },
+      });
+    }, stageEl);
+
+    ScrollTrigger.sort();
+    ScrollTrigger.refresh();
+
+    return () => {
+      ctx.revert();
+      quoteSplit?.revert();
+    };
+  }, [useGrid, works]);
+
+  useEffect(() => {
+    const stageEl = stageRef.current;
+    if (!stageEl || useGrid) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      setGalleryNearby(entry.isIntersecting);
+    }, { rootMargin: '400px 0px' });
+    observer.observe(stageEl);
+    return () => observer.disconnect();
+  }, [useGrid]);
+
+  useEffect(() => {
+    const hostEl = canvasHostRef.current;
+    if (useGrid || !galleryNearby || !hostEl || works.length === 0) return;
+    const touch = window.matchMedia('(pointer: coarse)').matches;
+    let disposed = false;
 
     const firstWorkTheta = works[0].theta;
     const lastWorkTheta = works[works.length - 1].theta;
@@ -232,22 +354,25 @@ export default function PortfolioSection() {
     let renderer: THREE.WebGLRenderer | null = null;
     try {
       renderer = new THREE.WebGLRenderer({
-        antialias: true,
+        antialias: !touch,
         powerPreference: 'high-performance',
       });
     } catch {
+      setWebglFailed(true);
       return;
     }
 
     const isSoftwareGl = detectSoftwareWebGL(renderer);
     if (isSoftwareGl) {
       renderer.dispose();
+      renderer.forceContextLoss();
       try {
         renderer = new THREE.WebGLRenderer({
           antialias: false,
           powerPreference: 'default',
         });
       } catch {
+        setWebglFailed(true);
         return;
       }
     }
@@ -256,7 +381,7 @@ export default function PortfolioSection() {
     let hostHeight = Math.max(hostEl.clientHeight, 1);
 
     renderer.setPixelRatio(
-      isSoftwareGl ? 1 : Math.min(window.devicePixelRatio || 1, 2)
+      isSoftwareGl ? 1 : Math.min(window.devicePixelRatio || 1, touch ? 1.25 : 2)
     );
     renderer.setSize(hostWidth, hostHeight, false);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -316,6 +441,8 @@ export default function PortfolioSection() {
     requestRenderRef.current = requestRender;
 
     const textureLoader = new THREE.TextureLoader();
+    const artLoads = new Map<number, () => Promise<void>>();
+    let activeLoads = 0;
     textureLoader.setCrossOrigin('anonymous');
 
     // 1. Expansive Seamless Herringbone Floor (+ Subtle Specular Reflection, completely clear floor)
@@ -331,8 +458,8 @@ export default function PortfolioSection() {
     if (!isSoftwareGl) {
       const floorReflector = new Reflector(floorGeo, {
         clipBias: 0.003,
-        textureWidth: 512,
-        textureHeight: 512,
+        textureWidth: touch ? 256 : 512,
+        textureHeight: touch ? 256 : 512,
         color: 0xe5dccb,
       });
       floorReflector.rotation.x = -Math.PI / 2;
@@ -568,7 +695,7 @@ export default function PortfolioSection() {
       })
     );
 
-    works.forEach((work) => {
+    works.forEach((work, index) => {
       const wp = getArcPoint(CURVE_RADIUS, work.theta);
       const nx = -Math.cos(work.theta);
       const nz = Math.sin(work.theta);
@@ -622,39 +749,35 @@ export default function PortfolioSection() {
       artMesh.position.set(0, 0, 0.04);
       bayGroup.add(artMesh);
 
-      const artTexture = trackTex(
-        textureLoader.load(work.image, (tex) => {
-          tex.colorSpace = THREE.SRGBColorSpace;
-          tex.anisotropy = maxAniso;
-          tex.needsUpdate = true;
-
-          const imgEl = tex.image as { width?: number; height?: number } | undefined;
-          if (imgEl && imgEl.width && imgEl.height) {
-            const natAspect = imgEl.width / imgEl.height;
-            let fitW = maxArtW;
-            let fitH = fitW / natAspect;
-            if (fitH > maxArtH) {
-              fitH = maxArtH;
-              fitW = fitH * natAspect;
-            }
-            artMesh.scale.set(fitW, fitH, 1);
+      artLoads.set(index, async () => {
+        const tex: THREE.Texture = await textureLoader.loadAsync(work.image);
+        if (disposed) {
+          tex.dispose();
+          return;
+        }
+        const image = tex.image as HTMLImageElement;
+        const scale = Math.min(maxArtW / image.width, maxArtH / image.height);
+        artMesh.scale.set(image.width * scale, image.height * scale, 1);
+        if (touch && Math.max(image.width, image.height) > 384) {
+          const ratio = 384 / Math.max(image.width, image.height);
+          const thumbnail = document.createElement('canvas');
+          thumbnail.width = Math.max(1, Math.round(image.width * ratio));
+          thumbnail.height = Math.max(1, Math.round(image.height * ratio));
+          const context = thumbnail.getContext('2d');
+          if (context) {
+            context.drawImage(image, 0, 0, thumbnail.width, thumbnail.height);
+            tex.image = thumbnail;
           }
-
-          const loadedMat = trackMat(
-            new THREE.MeshPhysicalMaterial({
-              map: tex,
-              color: '#FFFFFF',
-              roughness: 0.4,
-              metalness: 0.0,
-              clearcoat: 0.28,
-              clearcoatRoughness: 0.2,
-            })
-          );
-          artMesh.material = loadedMat;
-          requestRender();
-        })
-      );
-      artTexture.colorSpace = THREE.SRGBColorSpace;
+        }
+        trackTex(tex);
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.anisotropy = maxAniso;
+        tex.needsUpdate = true;
+        artMesh.material = trackMat(new THREE.MeshPhysicalMaterial({
+          map: tex, color: '#FFFFFF', roughness: 0.4, metalness: 0,
+          clearcoat: 0.28, clearcoatRoughness: 0.2,
+        }));
+      });
 
       const hitMat = trackMat(
         new THREE.MeshBasicMaterial({
@@ -698,7 +821,7 @@ export default function PortfolioSection() {
     });
 
     // Camera Sweeping Traversal Along the Curved Arc
-    let scrollProgress = 0;
+
     let pointerNdcX = 0;
     let pointerNdcY = 0;
     let hoveredWorkId: string | null = null;
@@ -724,6 +847,7 @@ export default function PortfolioSection() {
       }
 
       // First 8% eases into foyer curve, remaining 92% glides along all 49 works
+      const scrollProgress = galleryProgressRef.current;
       let thetaC: number;
       if (scrollProgress <= 0.08) {
         const foyerT = THREE.MathUtils.clamp(scrollProgress / 0.08, 0, 1);
@@ -757,6 +881,23 @@ export default function PortfolioSection() {
 
       const dt = Math.min(0.05, Math.max(0.001, (now - lastTime) / 1000));
       lastTime = now;
+
+      // Prioritize the frames along the current stretch of curved wall.
+      const walk = THREE.MathUtils.clamp((galleryProgressRef.current - 0.08) / 0.92, 0, 1);
+      const center = selectedWorkRef.current
+        ? works.findIndex(work => work.id === selectedWorkRef.current?.id)
+        : Math.round(walk * (works.length - 1));
+      for (let i = Math.max(0, center - 3); i <= Math.min(works.length - 1, center + 8); i++) {
+        if (activeLoads >= 2) break;
+        const load = artLoads.get(i);
+        if (!load) continue;
+        artLoads.delete(i);
+        activeLoads++;
+        void load().catch(() => { /* Keep the frame placeholder on a network error. */ }).finally(() => {
+          activeLoads--;
+          if (!disposed) requestRender();
+        });
+      }
 
       updateTargets();
 
@@ -883,6 +1024,7 @@ export default function PortfolioSection() {
     const onContextLost = (e: Event) => {
       e.preventDefault();
       isContextLost = true;
+      if (touch) setWebglFailed(true);
       if (rafId !== null) {
         cancelAnimationFrame(rafId);
         rafId = null;
@@ -907,102 +1049,10 @@ export default function PortfolioSection() {
     });
     resizeObserver.observe(hostEl);
 
-    const scrollDistance = Math.max(5800, works.length * 165);
-    let quoteSplit: SplitText | null = null;
-    const ctx = gsap.context(() => {
-      let quoteTl: gsap.core.Timeline | null = null;
-      let quoteRevealed = false;
-
-      if (quotePanelEl && quoteTextEl) {
-        quoteSplit = SplitText.create(quoteTextEl, {
-          type: 'lines,words,chars',
-          mask: 'lines',
-          linesClass: 'pb-[0.06em]',
-        });
-
-        gsap.set(quotePanelEl, { autoAlpha: 0, pointerEvents: 'none' });
-        gsap.set(quoteSplit.chars, { yPercent: 112, opacity: 0 });
-        if (quoteCtaEl) {
-          gsap.set(quoteCtaEl, { y: 14, opacity: 0 });
-        }
-
-        quoteTl = gsap.timeline({ paused: true });
-        quoteTl
-          .set(quotePanelEl, { autoAlpha: 1, pointerEvents: 'auto' })
-          .to(quoteSplit.chars, {
-            yPercent: 0,
-            opacity: 1,
-            duration: 0.78,
-            stagger: 0.02,
-            ease: 'power3.out',
-          });
-
-        if (quoteCtaEl) {
-          quoteTl.to(
-            quoteCtaEl,
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.65,
-              ease: 'power3.out',
-            },
-            '-=0.42'
-          );
-        }
-      }
-
-      ScrollTrigger.create({
-        trigger: stageEl,
-        start: 'top top',
-        end: `+=${scrollDistance}`,
-        pin: true,
-        pinSpacing: true,
-        scrub: 0.75,
-        anticipatePin: 1,
-        refreshPriority: 20,
-        onUpdate: (self) => {
-          scrollProgress = self.progress;
-
-          if (foyerEl) {
-            const foyerProgress = THREE.MathUtils.clamp(scrollProgress / 0.1, 0, 1);
-            gsap.set(foyerEl, {
-              opacity: 1 - foyerProgress,
-              y: -36 * foyerProgress,
-            });
-          }
-
-          // Trigger standalone SplitText entrance once reaching the gallery zone (independent of scroll speed)
-          if (quoteTl) {
-            if (!quoteRevealed && scrollProgress >= 0.08) {
-              quoteRevealed = true;
-              quoteTl.timeScale(1).play();
-            } else if (quoteRevealed && scrollProgress < 0.035) {
-              quoteRevealed = false;
-              quoteTl.timeScale(1.6).reverse();
-            }
-          }
-
-          if (hudEl) {
-            const hudAlpha = THREE.MathUtils.clamp(0.75 + scrollProgress * 2.5, 0.75, 1);
-            hudEl.style.opacity = String(hudAlpha);
-          }
-
-          if (progressBarEl) {
-            progressBarEl.style.width = `${Math.max(3, scrollProgress * 100)}%`;
-          }
-
-          requestRender();
-        },
-      });
-    }, stageEl);
-
-    ScrollTrigger.sort();
-    ScrollTrigger.refresh();
     requestRender();
 
     return () => {
-      quoteSplit?.revert();
-      ctx.revert();
+      disposed = true;
       resizeObserver.disconnect();
 
       domEl.removeEventListener('pointermove', onPointerMove);
@@ -1024,13 +1074,14 @@ export default function PortfolioSection() {
       pmremGenerator.dispose();
       roomEnv.dispose();
       renderer?.dispose();
+      renderer?.forceContextLoss();
 
       if (domEl.parentNode === hostEl) {
         hostEl.removeChild(domEl);
       }
       requestRenderRef.current = null;
     };
-  }, [prefersReducedMotion, works]);
+  }, [useGrid, galleryNearby, works]);
 
   return (
     <section
@@ -1039,9 +1090,9 @@ export default function PortfolioSection() {
       aria-label="Portfolio — Student Works Gallery"
       className={`relative ${
         selectedWork ? 'z-50' : 'z-20'
-      } w-full min-h-[100dvh] h-[100dvh] overflow-hidden bg-[#EAE1D1] text-[#0C121B]`}
+      } w-full min-h-[100dvh] ${useGrid ? '' : 'h-[100dvh] overflow-hidden'} bg-[#EAE1D1] text-[#0C121B]`}
     >
-      {!prefersReducedMotion ? (
+      {!useGrid ? (
         <>
           {/* Sweeping Curved 3D Gallery Stage */}
           <div
@@ -1131,7 +1182,7 @@ export default function PortfolioSection() {
         </>
       ) : (
         /* Reduced-Motion Accessible Grid of All Cohort Student Works */
-        <div className="relative z-10 w-full h-full overflow-y-auto py-20 px-6 sm:px-10">
+        <div className="relative z-10 w-full py-20 px-6 sm:px-10">
           <div className="max-w-[1160px] mx-auto">
             <div className="text-center mb-14">
               <p className="text-xs font-medium tracking-[0.2em] text-[#0C121B]/55">
@@ -1153,6 +1204,8 @@ export default function PortfolioSection() {
                 >
                   <div className="aspect-[4/3] bg-[#F7F4ED] p-3 border border-[#0C121B]/15 shadow-sm transition-transform duration-300 group-hover:-translate-y-1">
                     <img
+                      loading="lazy"
+                      decoding="async"
                       src={work.image}
                       alt={work.student}
                       className="w-full h-full object-cover"
@@ -1203,7 +1256,7 @@ export default function PortfolioSection() {
           aria-modal="true"
           aria-labelledby="work-modal-title"
           onClick={() => setSelectedWork(null)}
-          className="absolute inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-[#EAE1D1]/45"
+          className={`${useGrid ? 'fixed' : 'absolute'} inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-[#EAE1D1]/45`}
         >
           <div
             onClick={(e) => e.stopPropagation()}

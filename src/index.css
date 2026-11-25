@@ -29,6 +29,12 @@
 }
 
 /* Custom Brand Scrollbar — Black Navy Channel & Tactile Crimson Thumb */
+@media (pointer: coarse) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 ::-webkit-scrollbar {
   width: 9px;
   height: 9px;

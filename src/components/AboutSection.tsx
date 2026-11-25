@@ -7,17 +7,17 @@ import TearsInRainSection, { type TearsInRainHandle } from './TearsInRainSection
 
 gsap.registerPlugin(ScrollTrigger);
 
-const MAKGEOLLI_IMG_SRC = '/assets/aistudio/______________65cc6653.png';
+const MAKGEOLLI_IMG_SRC = '/assets/aistudio/makgeolli-sprite.webp';
 
 const PORTRAIT_SEQUENCE_SRCS = [
-  '/assets/aistudio/P20220616_002951331_8F0899B1-B9AB-48AC-8244-4152D2BE63A9_c5efede3.JPG',
-  '/assets/aistudio/P20220616_002951378_99B1BD13-9F9A-4EDC-B3D6-426FEE2C5E70_66012070.JPG',
-  '/assets/aistudio/P20220616_002951403_B6E3D026-E9EA-47F9-8DF4-76A165343033_170096cf.JPG',
-  '/assets/aistudio/P20220616_002951431_FE7C26CE-88E7-45CE-BE40-694A00E29D9F_aa2f4d34.JPG',
-  '/assets/aistudio/P20220616_002951456_4145C05A-D09F-468F-9151-D7D5C7A48B10_36b82bc9.JPG',
-  '/assets/aistudio/P20220616_002951593_828A16AE-AB58-4D96-BB14-2742DAAF5222_af2cd672.JPG',
-  '/assets/aistudio/P20220616_002951627_37F44D14-6657-421A-90A4-3C90C279BAC5_a3a587c1.JPG',
-  '/assets/aistudio/P20220616_002951661_817190CC-DEEB-4FFE-955A-3E591F377E2E_fec33ca5.JPG',
+  '/assets/aistudio/P20220616_002951331_8F0899B1-B9AB-48AC-8244-4152D2BE63A9_c5efede3.webp',
+  '/assets/aistudio/P20220616_002951378_99B1BD13-9F9A-4EDC-B3D6-426FEE2C5E70_66012070.webp',
+  '/assets/aistudio/P20220616_002951403_B6E3D026-E9EA-47F9-8DF4-76A165343033_170096cf.webp',
+  '/assets/aistudio/P20220616_002951431_FE7C26CE-88E7-45CE-BE40-694A00E29D9F_aa2f4d34.webp',
+  '/assets/aistudio/P20220616_002951456_4145C05A-D09F-468F-9151-D7D5C7A48B10_36b82bc9.webp',
+  '/assets/aistudio/P20220616_002951593_828A16AE-AB58-4D96-BB14-2742DAAF5222_af2cd672.webp',
+  '/assets/aistudio/P20220616_002951627_37F44D14-6657-421A-90A4-3C90C279BAC5_a3a587c1.webp',
+  '/assets/aistudio/P20220616_002951661_817190CC-DEEB-4FFE-955A-3E591F377E2E_fec33ca5.webp',
 ];
 
 const CAREER_ITEMS = [
@@ -176,8 +176,8 @@ export default function AboutSection() {
     const syncCanvasSize = () => {
       const { nextWidth, nextHeight } = getViewportSize();
       const nextDpr = Math.min(window.devicePixelRatio || 1, 2);
-      const pixelWidth = Math.round(nextWidth * nextDpr);
-      const pixelHeight = Math.round(nextHeight * nextDpr);
+      const pixelWidth = isMakgeolliVisible ? Math.round(nextWidth * nextDpr) : 1;
+      const pixelHeight = isMakgeolliVisible ? Math.round(nextHeight * nextDpr) : 1;
       const changed = width !== nextWidth || height !== nextHeight || dpr !== nextDpr;
       width = nextWidth;
       height = nextHeight;
@@ -504,6 +504,7 @@ export default function AboutSection() {
           const visible = isAboutPinned && time < makgeolliFadeStart + makgeolliFadeDuration;
           if (visible === isMakgeolliVisible) return;
           isMakgeolliVisible = visible;
+          if (syncCanvasSize()) rebuildBoundaries();
           if (!visible) {
             stopLoop();
           } else if (
@@ -538,9 +539,12 @@ export default function AboutSection() {
 
         const aboutTl = gsap.timeline({
           scrollTrigger: {
+            id: 'about-sequence',
             trigger: stageEl,
             start: 'top top',
-            end: '+=10600',
+            end: () => window.matchMedia('(pointer: coarse)').matches
+              ? `+=${Math.max(3600, stageEl.clientHeight * 6)}`
+              : '+=10600',
             pin: true,
             pinSpacing: true,
             scrub: 0.65,
@@ -569,6 +573,7 @@ export default function AboutSection() {
             },
             onLeaveBack: () => {
               isCoveredByTears = false;
+              aboutMeLayerEl.hidden = false;
               isAboutPinned = false;
               gsap.set(stageEl, { opacity: 0, pointerEvents: 'none' });
               syncMakgeolli(0);
@@ -621,6 +626,7 @@ export default function AboutSection() {
         aboutTl.to({}, { duration: 1.4 });
 
         const tearsStart = aboutTl.duration();
+        aboutTl.addLabel('tears', tearsStart);
         const tearsCleanup = tearsHandleRef.current?.attachTimeline(
           aboutTl,
           tearsStart,
@@ -633,10 +639,12 @@ export default function AboutSection() {
             },
             onFullscreenEnter: () => {
               isCoveredByTears = true;
+              aboutMeLayerEl.hidden = true;
               stopPortraitLoop();
             },
             onFullscreenLeaveBack: () => {
               isCoveredByTears = false;
+              aboutMeLayerEl.hidden = false;
               if (isAboutPinned) startPortraitLoop();
             },
           }
@@ -982,6 +990,7 @@ export default function AboutSection() {
           syncMakgeolli(0);
           stopPortraitLoop();
           tearsCleanup?.();
+          aboutMeLayerEl.hidden = false;
           glitchDelayCall?.kill();
           activeGlitchTl?.kill();
           analogDelayCall?.kill();
@@ -1089,19 +1098,21 @@ export default function AboutSection() {
               className="w-full h-full will-change-[transform,filter]"
             >
               {PORTRAIT_SEQUENCE_SRCS.map((src, index) => (
-                <img
-                  key={src}
-                  ref={(el) => {
-                    portraitImgRefs.current[index] = el;
-                  }}
-                  src={src}
-                  alt=""
-                  loading="eager"
-                  decoding="async"
-                  referrerPolicy="no-referrer"
-                  className="absolute inset-0 w-full h-full object-cover object-[50%_58%] md:object-[50%_55%] sepia-[0.2] saturate-[0.48] contrast-[1.16] brightness-[0.64] transition-opacity duration-500 ease-linear"
-                  style={{ opacity: index === 0 ? 1 : 0 }}
-                />
+                <picture key={src}>
+                  <source media="(pointer: coarse)" srcSet={src.replace('/aistudio/', '/aistudio/mobile/')} />
+                  <img
+                    ref={(el) => {
+                      portraitImgRefs.current[index] = el;
+                    }}
+                    src={src}
+                    alt=""
+                    loading="eager"
+                    decoding="async"
+                    referrerPolicy="no-referrer"
+                    className="absolute inset-0 w-full h-full object-cover object-[50%_58%] md:object-[50%_55%] sepia-[0.2] saturate-[0.48] contrast-[1.16] brightness-[0.64] transition-opacity duration-500 ease-linear"
+                    style={{ opacity: index === 0 ? 1 : 0 }}
+                  />
+                </picture>
               ))}
             </div>
           </div>
