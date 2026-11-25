@@ -140,7 +140,7 @@ export default function AboutSection() {
     });
 
     let width = document.documentElement.clientWidth || window.innerWidth;
-    let height = window.innerHeight || sectionEl.clientHeight;
+    let height = stageEl.clientHeight || window.innerHeight;
     let dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     let walls: Matter.Body[] = [];
@@ -162,14 +162,8 @@ export default function AboutSection() {
     let isDestroyed = false;
 
     const getViewportSize = () => {
-      const nextWidth =
-        document.documentElement.clientWidth ||
-        window.innerWidth ||
-        sectionEl.clientWidth;
-      const nextHeight =
-        window.innerHeight ||
-        document.documentElement.clientHeight ||
-        sectionEl.clientHeight;
+      const nextWidth = stageEl.clientWidth || document.documentElement.clientWidth;
+      const nextHeight = stageEl.clientHeight || window.innerHeight;
       return { nextWidth, nextHeight };
     };
 
@@ -1027,22 +1021,22 @@ export default function AboutSection() {
   }, []);
 
   return (
-    <div className="relative z-[35] motion-safe:-mt-[var(--prolog-stage-height,100dvh)]">
+    <div className="relative z-[35] motion-safe:-mt-[var(--pinned-stage-height,100dvh)]">
       <div
         ref={stageRef}
         data-about-stage
-        className="relative h-[100dvh] motion-reduce:h-auto w-full overflow-hidden bg-[#0C121B] text-[#D7D0C3]"
+        className="relative motion-safe:h-[var(--pinned-stage-height,100dvh)] motion-safe:min-h-[var(--pinned-stage-height,100dvh)] w-full overflow-hidden bg-[#0C121B] text-[#D7D0C3]"
       >
         <section
           id="about"
           ref={sectionRef}
           aria-label="About Me"
-          className="motion-safe:absolute motion-safe:inset-0 motion-reduce:relative motion-reduce:min-h-[100dvh] z-10 h-[100dvh] w-full overflow-hidden bg-[#0C121B] text-[#D7D0C3]"
+          className="motion-safe:absolute motion-safe:inset-0 motion-safe:h-full motion-reduce:relative motion-reduce:h-dvh z-10 w-full overflow-hidden bg-[#0C121B] text-[#D7D0C3]"
         >
         {/* BEAT 1: B-Movie Comedy Makgeolli Avalanche Stage */}
         <div
           ref={makgeolliLayerRef}
-          className="absolute inset-0 z-10 overflow-hidden bg-[#0C121B]"
+          className="absolute inset-0 z-10 h-full overflow-hidden bg-[#0C121B]"
         >
           {/* Atmospheric B-Movie Noir Stage Lighting */}
           <div

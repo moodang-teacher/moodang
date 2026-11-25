@@ -728,7 +728,7 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
       id="tears_in_rain"
       ref={sectionRef}
       aria-label="Blade Runner Tears in Rain"
-      className="motion-safe:absolute motion-safe:inset-0 motion-reduce:relative motion-reduce:min-h-[100dvh] z-30 h-[100dvh] w-full overflow-hidden text-[#EAE5DC]"
+      className="motion-safe:absolute motion-safe:inset-0 motion-safe:h-full motion-reduce:relative motion-reduce:h-dvh z-30 w-full overflow-hidden text-[#EAE5DC]"
     >
       {/* Dimming #0C121B veil over About Me behind the expanding slit */}
       <div
@@ -743,7 +743,7 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
         className="absolute inset-x-0 top-[50%] bottom-[50%] motion-reduce:top-0 motion-reduce:bottom-0 z-10 w-full overflow-hidden bg-[#0C121B] will-change-[top,bottom]"
       >
         {/* Fixed full-viewport inner video frame so slit opening crops cleanly without squishing */}
-        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 w-full h-[100dvh]">
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 w-full motion-safe:h-[var(--pinned-stage-height,100dvh)] motion-reduce:h-dvh">
           {/* Fallback atmospheric black-navy + moonlight + deep crimson glow */}
           <div
             aria-hidden="true"
@@ -893,7 +893,7 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
                 {isFinal && (
                   <span
                     ref={tributeRef}
-                    className="mt-4 sm:mt-6 basis-full block text-center font-display text-[9px] sm:text-[11px] md:text-[14px] font-medium leading-normal tracking-[0.14em] text-[#D7D0C3]/85 drop-shadow-[0_4px_18px_rgba(7,11,17,0.95)]"
+                    className="tears-tribute mt-4 sm:mt-6 basis-full block text-center font-display text-[9px] sm:text-[11px] md:text-[14px] font-medium leading-normal tracking-[0.14em] text-[#D7D0C3]/85 drop-shadow-[0_4px_18px_rgba(7,11,17,0.95)]"
                   >
                     {RIP_TRIBUTE_TEXT}
                   </span>
@@ -916,7 +916,7 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
                 {line}
               </p>
             ))}
-            <p className="pt-3 text-[9px] sm:text-[10px] md:text-[11px] font-medium tracking-[0.14em] text-[#D7D0C3]/85">
+            <p className="tears-tribute pt-3 text-[9px] sm:text-[10px] md:text-[11px] font-medium tracking-[0.14em] text-[#D7D0C3]/85">
               {RIP_TRIBUTE_TEXT}
             </p>
           </blockquote>

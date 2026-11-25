@@ -31,8 +31,8 @@
 /* Custom Brand Scrollbar — Black Navy Channel & Tactile Crimson Thumb */
 @media (pointer: coarse) {
   :root {
-    /* Use the same stable height for the pin and the overlap into About. */
-    --prolog-stage-height: 100lvh;
+    /* Keep pinned sections covered as mobile browser controls move. */
+    --pinned-stage-height: 100lvh;
   }
 
   html {
@@ -41,7 +41,7 @@
 
   #prolog {
     background-color: var(--color-main);
-    min-height: var(--prolog-stage-height);
+    min-height: var(--pinned-stage-height);
   }
 
   .contact-scroll-area {
@@ -54,6 +54,11 @@
     height: auto;
     min-height: 100dvh;
   }
+}
+
+.tears-tribute a {
+  color: inherit;
+  text-decoration: none;
 }
 
 ::-webkit-scrollbar {

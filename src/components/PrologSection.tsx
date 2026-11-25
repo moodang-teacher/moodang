@@ -207,7 +207,7 @@ export default function PrologSection() {
     <section
       id="prolog"
       ref={sectionRef}
-      className="relative z-30 h-[var(--prolog-stage-height,100dvh)] w-full overflow-hidden text-[#D7D0C3]"
+      className="relative z-30 h-[var(--pinned-stage-height,100dvh)] w-full overflow-hidden text-[#D7D0C3]"
     >
       {/* Solid #0C121B Seal: fades in right as Prolog docks at top: 0 so pinned view fully covers Hero */}
       <div
