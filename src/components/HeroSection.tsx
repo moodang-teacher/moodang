@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
@@ -41,7 +42,7 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
 
   const [videoFailed, setVideoFailed] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const mm = gsap.matchMedia();
 
     mm.add('(prefers-reduced-motion: no-preference)', () => {
@@ -53,6 +54,7 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
         const revealItems = sectionRef.current?.querySelectorAll('[data-hero-reveal]');
 
         // Initial hidden states before timeline starts
+        gsap.set(preloaderRef.current, { display: 'flex' });
         gsap.set(portalStageRef.current, {
           clipPath: 'inset(45% 47.5% 45% 47.5% round 4px)',
           opacity: 0,
@@ -522,9 +524,7 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
     });
 
     mm.add('(prefers-reduced-motion: reduce)', () => {
-      if (preloaderRef.current) {
-        preloaderRef.current.style.display = 'none';
-      }
+      gsap.set(preloaderRef.current, { display: 'none' });
     });
 
     return () => mm.revert();
@@ -536,46 +536,50 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
       ref={sectionRef}
       className="sticky top-0 z-10 isolate h-dvh w-full overflow-hidden bg-[#0C121B] flex flex-col justify-between"
     >
-      {/* Preloader Curtain Overlay: Drawing SVG Seal + Word-by-Word Slogan */}
-      <div
-        ref={preloaderRef}
-        aria-hidden="true"
-        className="fixed inset-0 z-50 bg-[#0C121B] flex items-center justify-center pointer-events-none"
-      >
-        <div ref={lockupRef} className="flex flex-col items-center justify-center gap-5">
-          <svg
-            ref={svgLogoRef}
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 370 350"
-            width="76"
-            height="72"
-            fill="currentColor"
-            stroke="currentColor"
-            strokeWidth="6"
-            strokeLinecap="square"
-            strokeLinejoin="miter"
-            className="text-[#A52A43]"
-          >
-            <g id="preloader-moodang-teacher">
-              <path d="M292 188.62h-91V147h-32.26v41.62H62.65V283H92v-74.59h185.65V283H307v-94.38h-15z" />
-              <path d="M0 0v350h370V0zm168.74 30v58H201V30h139v71.84l-62.71-36.2-93.29 53-93.29-53L30 100.69V30zM201 320v-33h29.6v-7.61H201v-15.3h59.46v-43.84H108.69v43.84h60.05v15.3h-30.19V287h30.19v33H30V123.55l61.2-35.29L150.74 120h-49.59v6h165.7v-6h-49.59l59.54-31.74L340 124.7V320zm-77.24-71v-13.7h121.63V249z" />
-              <path transform="rotate(-81.81 99.5 157.502)" d="M93 121h13v73H93z" />
-              <path transform="rotate(-8.19 268.459 157.508)" d="M232 151h73v13h-73z" />
-            </g>
-          </svg>
+      {/* Keep the splash above the sticky Hero, site navigation and later sections. */}
+      {createPortal(
+        <div
+          ref={preloaderRef}
+          aria-hidden="true"
+          data-hero-splash
+          className="fixed inset-0 z-[100] bg-[#0C121B] flex items-center justify-center motion-reduce:hidden"
+        >
+          <div ref={lockupRef} className="flex flex-col items-center justify-center gap-5">
+            <svg
+              ref={svgLogoRef}
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 370 350"
+              width="76"
+              height="72"
+              fill="currentColor"
+              stroke="currentColor"
+              strokeWidth="6"
+              strokeLinecap="square"
+              strokeLinejoin="miter"
+              className="text-[#A52A43]"
+            >
+              <g id="preloader-moodang-teacher">
+                <path d="M292 188.62h-91V147h-32.26v41.62H62.65V283H92v-74.59h185.65V283H307v-94.38h-15z" />
+                <path d="M0 0v350h370V0zm168.74 30v58H201V30h139v71.84l-62.71-36.2-93.29 53-93.29-53L30 100.69V30zM201 320v-33h29.6v-7.61H201v-15.3h59.46v-43.84H108.69v43.84h60.05v15.3h-30.19V287h30.19v33H30V123.55l61.2-35.29L150.74 120h-49.59v6h165.7v-6h-49.59l59.54-31.74L340 124.7V320zm-77.24-71v-13.7h121.63V249z" />
+                <path transform="rotate(-81.81 99.5 157.502)" d="M93 121h13v73H93z" />
+                <path transform="rotate(-8.19 268.459 157.508)" d="M232 151h73v13h-73z" />
+              </g>
+            </svg>
 
-          <div
-            ref={sloganRef}
-            className="font-medium text-[#D7D0C3] select-none flex items-center justify-center gap-2 sm:gap-2.5 whitespace-nowrap text-sm sm:text-base leading-none tracking-[0.06em]"
-          >
-            {SLOGAN_WORDS.map((word, index) => (
-              <span key={index} data-slogan-word className="inline-block">
-                {word}
-              </span>
-            ))}
+            <div
+              ref={sloganRef}
+              className="font-medium text-[#D7D0C3] select-none flex items-center justify-center gap-2 sm:gap-2.5 whitespace-nowrap text-sm sm:text-base leading-none tracking-[0.06em]"
+            >
+              {SLOGAN_WORDS.map((word, index) => (
+                <span key={index} data-slogan-word className="inline-block">
+                  {word}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
-      </div>
+        </div>,
+        document.body
+      )}
 
       {/* Expanding Portal Stage */}
       <div
