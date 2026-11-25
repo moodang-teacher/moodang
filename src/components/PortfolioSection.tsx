@@ -31,6 +31,7 @@ const CAM_OFFSET = 4.6;
 const CAM_RADIUS = CURVE_RADIUS - CAM_OFFSET;
 const LOOK_AHEAD_THETA = 0.29;
 const LOOK_RADIUS = CURVE_RADIUS - 5.6;
+const MAX_WALL_VIEW_YAW = THREE.MathUtils.degToRad(42);
 const EXHIBIT_ARC_STEP = 2.45; // generous museum gallery breathing room between frames
 const EYE_HEIGHT = 1.72;
 
@@ -824,6 +825,7 @@ export default function PortfolioSection() {
 
     let pointerNdcX = 0;
     let pointerNdcY = 0;
+    let mousePosition: { x: number; y: number } | null = null;
     let hoveredWorkId: string | null = null;
 
     const initLookPt = getArcPoint(LOOK_RADIUS, camStartTheta + LOOK_AHEAD_THETA);
@@ -868,10 +870,16 @@ export default function PortfolioSection() {
         EYE_HEIGHT,
         camPt.z + nz * (pointerNdcX * 0.14)
       );
+      const lookX = lookPt.x + nx * (pointerNdcX * 0.45) - targetCamPos.x;
+      const lookZ = lookPt.z + nz * (pointerNdcX * 0.45) - targetCamPos.z;
+      // Turn toward the outer wall from the current position on the scroll path.
+      const yaw = THREE.MathUtils.smoothstep(pointerNdcX, 0.08, 1) * MAX_WALL_VIEW_YAW;
+      const cos = Math.cos(yaw);
+      const sin = Math.sin(yaw);
       targetLookAt.set(
-        lookPt.x + nx * (pointerNdcX * 0.45),
+        targetCamPos.x + lookX * cos - lookZ * sin,
         1.88 + pointerNdcY * 0.16,
-        lookPt.z + nz * (pointerNdcX * 0.45)
+        targetCamPos.z + lookX * sin + lookZ * cos
       );
     };
 
@@ -914,6 +922,18 @@ export default function PortfolioSection() {
       camera.lookAt(currentLookAt);
       camera.updateMatrixWorld();
 
+      // A frame can move under a stationary cursor while the camera is turning.
+      if (mousePosition && !selectedWorkRef.current && now - lastMoveCheck > 32) {
+        lastMoveCheck = now;
+        const hit = performRaycast(mousePosition.x, mousePosition.y);
+        const nextId = hit?.id ?? null;
+        if (nextId !== hoveredWorkId) {
+          hoveredWorkId = nextId;
+          setHoveredWork(hit);
+          renderer.domElement.style.cursor = hit ? 'pointer' : 'default';
+        }
+      }
+
       let frameAnim = false;
       for (const rig of rigs) {
         const isActive =
@@ -950,7 +970,10 @@ export default function PortfolioSection() {
 
     const performRaycast = (clientX: number, clientY: number): CurvedArtwork | null => {
       const rect = renderer!.domElement.getBoundingClientRect();
-      if (rect.width <= 0 || rect.height <= 0) return null;
+      if (rect.width <= 0 || rect.height <= 0 ||
+          clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
+        return null;
+      }
 
       pointerVec.x = ((clientX - rect.left) / rect.width) * 2 - 1;
       pointerVec.y = -((clientY - rect.top) / rect.height) * 2 + 1;
@@ -964,24 +987,14 @@ export default function PortfolioSection() {
     };
 
     const onPointerMove = (e: PointerEvent) => {
-      if (selectedWorkRef.current) return;
+      if (e.pointerType !== 'mouse' || selectedWorkRef.current) return;
       const rect = renderer!.domElement.getBoundingClientRect();
       if (rect.width > 0 && rect.height > 0) {
         pointerNdcX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
         pointerNdcY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
       }
 
-      const now = performance.now();
-      if (now - lastMoveCheck > 32) {
-        lastMoveCheck = now;
-        const hit = performRaycast(e.clientX, e.clientY);
-        const nextId = hit?.id ?? null;
-        if (nextId !== hoveredWorkId) {
-          hoveredWorkId = nextId;
-          setHoveredWork(hit);
-          renderer!.domElement.style.cursor = hit ? 'pointer' : 'default';
-        }
-      }
+      mousePosition = { x: e.clientX, y: e.clientY };
       requestRender();
     };
 
@@ -1005,6 +1018,7 @@ export default function PortfolioSection() {
     };
 
     const onPointerLeave = () => {
+      mousePosition = null;
       pointerNdcX = 0;
       pointerNdcY = 0;
       if (hoveredWorkId !== null) {
