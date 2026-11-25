@@ -766,7 +766,7 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
                   poster={TEARS_POSTER_SRC}
                   preload="metadata"
                   aria-label="빗속에서 독백하는 영화 블레이드 러너 로이 배티 장면"
-                  className="w-full h-full object-cover object-[50%_47%] scale-[1.28] md:scale-[1.32] sepia-[0.16] saturate-[0.84] contrast-[1.12] brightness-[0.88] pointer-events-none select-none will-change-transform"
+                  className="tears-video w-full h-full object-cover object-[50%_47%] scale-[1.28] md:scale-[1.32] sepia-[0.16] saturate-[0.84] contrast-[1.12] brightness-[0.88] pointer-events-none select-none will-change-transform"
                 />
               </div>
             </div>

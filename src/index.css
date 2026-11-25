@@ -61,6 +61,12 @@
   text-decoration: none;
 }
 
+@media (max-width: 600px) and (orientation: portrait) {
+  .tears-video {
+    object-position: 47% 47%;
+  }
+}
+
 ::-webkit-scrollbar {
   width: 9px;
   height: 9px;
