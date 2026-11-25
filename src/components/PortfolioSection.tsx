@@ -1121,12 +1121,12 @@ export default function PortfolioSection() {
           {/* Bright Gallery Foyer Header */}
           <div
             ref={foyerRef}
-            className="pointer-events-none absolute inset-x-0 top-[10.5%] sm:top-[11%] z-10 flex flex-col items-center text-center px-6 will-change-transform"
+            className="pointer-events-none absolute inset-x-0 top-[10.5%] sm:top-[11%] z-10 flex flex-col items-center text-center px-6 will-change-transform [--section-title-size:clamp(2.3rem,4.5vw,3.75rem)]"
           >
             <p className="text-xs sm:text-[13px] font-medium tracking-[0.2em] text-[#0C121B]/55">
               모두 내 아픈 손가락
             </p>
-            <h2 className="mt-2 font-display section-title [--section-title-size:clamp(2.3rem,4.5vw,3.75rem)] font-bold tracking-[-0.03em] leading-none text-[#0C121B]">
+            <h2 className="mt-2 font-display section-title font-bold tracking-[-0.03em] leading-none text-[#0C121B]">
               portfolio<span className="text-[#A52A43]">.</span>
             </h2>
             <HanjaArtwork artwork="portfolio" />
@@ -1198,14 +1198,14 @@ export default function PortfolioSection() {
         /* Reduced-Motion Accessible Grid of All Cohort Student Works */
         <div className="relative z-10 w-full py-20 px-6 sm:px-10">
           <div className="max-w-[1160px] mx-auto">
-            <div className="text-center mb-14">
+            <div className="text-center mb-14 [--section-title-size:2.25rem] sm:[--section-title-size:3rem]">
               <p className="text-xs font-medium tracking-[0.2em] text-[#0C121B]/55">
                 모두 내 아픈 손가락
               </p>
-              <h2 className="mt-2 font-display section-title [--section-title-size:2.25rem] sm:[--section-title-size:3rem] font-bold tracking-[-0.03em] text-[#0C121B]">
+              <h2 className="mt-2 font-display section-title font-bold tracking-[-0.03em] text-[#0C121B]">
                 portfolio<span className="text-[#A52A43]">.</span>
               </h2>
-              <HanjaArtwork artwork="portfolio" compact className="mt-6" />
+              <HanjaArtwork artwork="portfolio" />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

@@ -22,7 +22,7 @@ export default function HanjaArtwork({
   const { label, width, height } = artworks[artwork];
   const size = compact
     ? 'h-[clamp(3.25rem,14vw,4.5rem)] md:h-14'
-    : 'mt-6 h-[clamp(3.25rem,14vw,4.5rem)] md:h-[clamp(3rem,5vw,6.75rem)]';
+    : 'section-hanja mt-6';
 
   return (
     <span

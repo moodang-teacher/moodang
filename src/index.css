@@ -110,9 +110,18 @@
   font-family: var(--font-display);
 }
 
-.section-title {
+.section-title,
+.section-hanja {
   --section-title-reduction: max(0px, min(1vw, calc((100vw - 1280px) * 0.06), calc((2560px - 100vw) * 0.03)));
-  font-size: calc(var(--section-title-size, clamp(2.2rem, 4.4vw, 3.65rem)) - var(--section-title-reduction));
+  --section-heading-size: calc(var(--section-title-size, clamp(2.2rem, 4.4vw, 3.65rem)) - var(--section-title-reduction));
+}
+
+.section-title {
+  font-size: var(--section-heading-size);
+}
+
+.section-hanja {
+  width: min(100%, calc(var(--section-heading-size) * 5.75));
 }
 
 @keyframes film-grain-shift {
