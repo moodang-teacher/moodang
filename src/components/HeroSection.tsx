@@ -690,14 +690,14 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
         />
       </div>
 
-      <div className="pointer-events-none absolute inset-y-[24.5%] left-0 z-[25] flex w-[40%] justify-center md:inset-y-[17.5%]">
+      <div className="pointer-events-none absolute inset-x-0 inset-y-[24.5%] z-[25] flex justify-center md:inset-y-[17.5%]">
         <img
           data-hero-reveal
           src="/assets/hanja/hero.svg"
           alt="巫堂先生"
           width={464}
           height={1334}
-          className="h-full w-auto max-w-full object-contain drop-shadow-[0_6px_24px_rgba(12,18,27,0.9)]"
+          className="h-full w-auto max-w-[40%] object-contain drop-shadow-[0_6px_24px_rgba(12,18,27,0.9)]"
         />
       </div>
 
@@ -721,7 +721,7 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
               <span className="text-[#D7D0C3]">teacher</span>
             </h1>
 
-            <figure data-hero-reveal className="mt-7 md:mt-10 max-w-[600px] mx-auto text-center">
+            <figure data-hero-reveal className="hidden mt-7 md:mt-10 max-w-[600px] mx-auto text-center">
               <blockquote className="text-lg sm:text-xl md:text-[22px] font-medium leading-[1.6] tracking-[-0.015em] text-[#D7D0C3]">
                 규칙을 알아야 그 규칙을 파괴할 수 있다.
               </blockquote>
