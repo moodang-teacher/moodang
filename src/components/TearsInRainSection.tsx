@@ -3,6 +3,7 @@ import gsap from 'gsap';
 
 const TEARS_VIDEO_SRC = '/assets/aistudio/Time_to_Die_scrub.mp4';
 const MOBILE_TEARS_VIDEO_SRC = '/assets/aistudio/Time_to_Die_mobile.mp4';
+const TEARS_POSTER_SRC = '/assets/aistudio/Time_to_Die_poster.webp';
 const FALLBACK_VIDEO_DURATION = 50.633917;
 
 const TEARS_LINES = [
@@ -82,6 +83,8 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
   const isSectionActiveRef = useRef(false);
   const syncEffectsRef = useRef<(active: boolean) => void>(() => {});
   const syncVideoRef = useRef<() => void>(() => {});
+  const prepareVideoRef = useRef<() => void>(() => {});
+  const releaseVideoIfOffscreenRef = useRef<() => void>(() => {});
 
   const getClampedTargetTime = (videoEl: HTMLVideoElement) => {
     const duration =
@@ -108,6 +111,7 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
     if (!visible) {
       cancelPendingSeek();
       videoRef.current?.pause();
+      releaseVideoIfOffscreenRef.current();
     }
   };
 
@@ -125,21 +129,26 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
     let lastSeekAt = -Infinity;
     let hasPrimed = false;
     let disposed = false;
-    const attachSource = () => {
+    let stageOnscreen = false;
+    const prepareVideo = () => {
       if (!videoEl.hasAttribute('src')) {
+        videoEl.muted = true;
+        videoEl.preload = 'auto';
         videoEl.src = touchInput.matches ? MOBILE_TEARS_VIDEO_SRC : TEARS_VIDEO_SRC;
+        videoEl.load();
       }
     };
+    const releaseVideoIfOffscreen = () => {
+      if (stageOnscreen || isSceneVisibleRef.current || !touchInput.matches || !videoEl.hasAttribute('src')) return;
+      cancelPendingSeek();
+      videoEl.pause();
+      videoEl.removeAttribute('src');
+      videoEl.load();
+      hasPrimed = false;
+    };
     const stageObserver = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        attachSource();
-      } else if (touchInput.matches && videoEl.hasAttribute('src')) {
-        cancelPendingSeek();
-        videoEl.pause();
-        videoEl.removeAttribute('src');
-        videoEl.load();
-        hasPrimed = false;
-      }
+      stageOnscreen = entry.isIntersecting;
+      releaseVideoIfOffscreen();
     });
     if (sectionRef.current) stageObserver.observe(sectionRef.current);
 
@@ -174,9 +183,9 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
 
     const syncVideo = () => {
       if (!isSceneVisibleRef.current) return;
-      attachSource();
-      if (videoEl.preload !== 'auto') videoEl.preload = 'auto';
-      if (!hasPrimed && desiredProgressRef.current > 0.01 && videoEl.readyState >= 2) {
+      prepareVideo();
+      // Request muted playback at the open slit even if iOS deferred loading.
+      if (!hasPrimed && desiredProgressRef.current >= 0.168) {
         hasPrimed = true;
         videoEl.play()
           .then(() => {
@@ -191,7 +200,18 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
       flushVideoSeek();
     };
 
+    const useOriginalVideo = () => {
+      if (videoEl.getAttribute('src') !== MOBILE_TEARS_VIDEO_SRC) return;
+      cancelPendingSeek();
+      hasPrimed = false;
+      videoEl.src = TEARS_VIDEO_SRC;
+      videoEl.load();
+    };
+
+    prepareVideoRef.current = prepareVideo;
+    releaseVideoIfOffscreenRef.current = releaseVideoIfOffscreen;
     syncVideoRef.current = syncVideo;
+    videoEl.addEventListener('error', useOriginalVideo);
     videoEl.addEventListener('loadedmetadata', syncVideo);
     videoEl.addEventListener('loadeddata', syncVideo);
     videoEl.addEventListener('canplay', syncVideo);
@@ -204,6 +224,9 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
       cancelPendingSeek();
       videoEl.pause();
       syncVideoRef.current = () => {};
+      prepareVideoRef.current = () => {};
+      releaseVideoIfOffscreenRef.current = () => {};
+      videoEl.removeEventListener('error', useOriginalVideo);
       videoEl.removeEventListener('loadedmetadata', syncVideo);
       videoEl.removeEventListener('loadeddata', syncVideo);
       videoEl.removeEventListener('canplay', syncVideo);
@@ -512,8 +535,7 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
 
         // Begin buffering during the completed portrait's reading beat.
         tl.call(() => {
-          const videoEl = videoRef.current;
-          if (videoEl) videoEl.preload = 'auto';
+          if (hooks?.isStageVisible?.() ?? true) prepareVideoRef.current();
         }, [], Math.max(0, startAt - 1.4));
 
         // 1. Reveal section & open narrow 100%-wide horizontal center slit over motionless About Me
@@ -741,6 +763,7 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
                   ref={videoRef}
                   muted
                   playsInline
+                  poster={TEARS_POSTER_SRC}
                   preload="metadata"
                   aria-label="빗속에서 독백하는 영화 블레이드 러너 로이 배티 장면"
                   className="w-full h-full object-cover object-[50%_47%] scale-[1.28] md:scale-[1.32] sepia-[0.16] saturate-[0.84] contrast-[1.12] brightness-[0.88] pointer-events-none select-none will-change-transform"

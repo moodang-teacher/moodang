@@ -33,6 +33,17 @@
   html {
     scroll-behavior: auto;
   }
+
+  .contact-scroll-area {
+    height: auto;
+  }
+
+  .contact-footer {
+    position: relative;
+    inset: auto;
+    height: auto;
+    min-height: 100dvh;
+  }
 }
 
 ::-webkit-scrollbar {

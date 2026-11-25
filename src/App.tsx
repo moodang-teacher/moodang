@@ -149,7 +149,7 @@ export default function App() {
     <div className="min-h-screen bg-[#0C121B] text-[#D7D0C3]">
       <Navbar activeSection={activeSection} onNavigate={handleNavigate} />
 
-      <main className="relative">
+      <main className="relative bg-[#0C121B]">
         <div className="relative">
           <HeroSection onExplore={() => handleNavigate('prolog')} />
           <PrologSection />
@@ -160,14 +160,9 @@ export default function App() {
         <EpilogueSection />
       </main>
 
-      {/* Transparent scroll runway that lifts main upward like a curtain over fixed ContactFooter */}
-      <div
-        id="contact-trigger"
-        aria-hidden="true"
-        className="relative z-0 h-[88dvh] w-full pointer-events-none"
-      />
-
-      <ContactFooter />
+      <div id="contact-trigger" className="contact-scroll-area relative h-[88dvh] w-full">
+        <ContactFooter />
+      </div>
 
       <SkullTop
         visible={activeSection !== 'hero'}

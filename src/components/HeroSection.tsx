@@ -534,7 +534,7 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
     <section
       id="hero"
       ref={sectionRef}
-      className="sticky top-0 z-10 isolate h-screen min-h-[100dvh] w-full overflow-hidden bg-[#0C121B] flex flex-col justify-between"
+      className="sticky top-0 z-10 isolate h-dvh w-full overflow-hidden bg-[#0C121B] flex flex-col justify-between"
     >
       {/* Preloader Curtain Overlay: Drawing SVG Seal + Word-by-Word Slogan */}
       <div

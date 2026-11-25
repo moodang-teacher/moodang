@@ -6,7 +6,7 @@ export default function ContactFooter() {
     <footer
       id="contact"
       aria-label="Contact Footer"
-      className="fixed inset-x-0 bottom-0 z-[5] w-full h-[88dvh] bg-[linear-gradient(180deg,#080B10_0%,#0C121B_28%,#101723_72%,#17111A_100%)] text-[#D7D0C3] overflow-hidden flex flex-col justify-between"
+      className="contact-footer fixed inset-x-0 bottom-0 z-[5] w-full h-[88dvh] bg-[linear-gradient(180deg,#080B10_0%,#0C121B_28%,#101723_72%,#17111A_100%)] text-[#D7D0C3] overflow-hidden flex flex-col justify-between"
     >
       {/* Brand Navy & Crimson Atmospheric Gradient */}
       <div
@@ -14,7 +14,7 @@ export default function ContactFooter() {
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_78%_58%_at_50%_104%,rgba(165,42,67,0.24)_0%,rgba(165,42,67,0.06)_46%,transparent_78%),radial-gradient(circle_at_18%_40%,rgba(215,208,195,0.04)_0%,transparent_52%)]"
       />
 
-      <div className="relative z-10 w-full h-full px-6 sm:px-10 md:px-14 lg:px-16 pt-24 sm:pt-28 pb-24 sm:pb-12 flex flex-col justify-between gap-10">
+      <div className="relative z-10 w-full flex-1 px-6 sm:px-10 md:px-14 lg:px-16 pt-24 sm:pt-28 pb-24 sm:pb-12 flex flex-col justify-between gap-10">
         {/* Section Heading Matching Other Sections (No Hanja) */}
         <div className="w-full text-center flex flex-col items-center">
           <p className="text-xs sm:text-[13px] font-medium tracking-[0.2em] text-[#D7D0C3]/55">
