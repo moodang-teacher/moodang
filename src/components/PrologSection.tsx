@@ -207,7 +207,7 @@ export default function PrologSection() {
     <section
       id="prolog"
       ref={sectionRef}
-      className="relative z-30 h-[100dvh] w-full overflow-hidden text-[#D7D0C3]"
+      className="relative z-30 h-[var(--prolog-stage-height,100dvh)] w-full overflow-hidden text-[#D7D0C3]"
     >
       {/* Solid #0C121B Seal: fades in right as Prolog docks at top: 0 so pinned view fully covers Hero */}
       <div
@@ -290,7 +290,7 @@ export default function PrologSection() {
       </div>
 
       {/* Centered Editorial Copy (Exact Verbatim Text, Line-by-Line Scroll Reveal) */}
-      <div className="relative z-20 h-full w-full max-w-[1100px] mx-auto px-6 sm:px-10 pt-20 md:pt-24 pb-8 flex items-center justify-center">
+      <div className="relative z-20 h-dvh w-full max-w-[1100px] mx-auto px-6 sm:px-10 pt-20 md:pt-24 pb-8 flex items-center justify-center">
         <div
           ref={textColumnRef}
           className="w-full max-w-[680px] text-center flex flex-col items-center"

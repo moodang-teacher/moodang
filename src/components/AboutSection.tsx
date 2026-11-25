@@ -1027,7 +1027,7 @@ export default function AboutSection() {
   }, []);
 
   return (
-    <div className="relative z-[35] motion-safe:-mt-[100dvh]">
+    <div className="relative z-[35] motion-safe:-mt-[var(--prolog-stage-height,100dvh)]">
       <div
         ref={stageRef}
         data-about-stage
