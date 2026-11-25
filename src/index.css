@@ -72,8 +72,9 @@
   font-family: var(--font-display);
 }
 
-.font-brush {
-  font-family: "Yuji Boku", serif;
+.section-title {
+  --section-title-reduction: max(0px, min(1vw, calc((100vw - 1280px) * 0.06), calc((2560px - 100vw) * 0.03)));
+  font-size: calc(var(--section-title-size, clamp(2.2rem, 4.4vw, 3.65rem)) - var(--section-title-reduction));
 }
 
 @keyframes film-grain-shift {
@@ -91,6 +92,10 @@
   background-size: 220px 220px;
   animation: film-grain-shift 0.45s steps(1) infinite;
   will-change: transform;
+}
+
+#tears_in_rain:not([data-tears-visible]) .cinema-grain {
+  animation-play-state: paused;
 }
 
 @keyframes skull-spin {

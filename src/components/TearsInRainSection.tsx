@@ -30,8 +30,14 @@ const LINE_CUE_WINDOWS: Array<{
 ];
 
 export const TEARS_TIMELINE_DURATION = 10;
+const TEARS_HOLD_DURATION = 0.45;
+const TEARS_FADE_DURATION = 0.95;
+const TEARS_SCENE_DURATION =
+  TEARS_TIMELINE_DURATION + TEARS_HOLD_DURATION + TEARS_FADE_DURATION;
+const TOUCH_SEEK_INTERVAL_MS = 1000 / 24;
 
 export interface TearsInRainHooks {
+  isStageVisible?: () => boolean;
   onFullscreenEnter?: () => void;
   onFullscreenLeaveBack?: () => void;
 }
@@ -70,11 +76,11 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
   const tributeRef = useRef<HTMLSpanElement>(null);
 
   const desiredProgressRef = useRef(0);
-  const isSeekingRef = useRef(false);
-  const seekFallbackRef = useRef<number | null>(null);
-  const hasPrimedRef = useRef(false);
+  const pendingSeekRef = useRef<number | null>(null);
+  const isSceneVisibleRef = useRef(false);
   const isSectionActiveRef = useRef(false);
-  const isDestroyedRef = useRef(false);
+  const syncEffectsRef = useRef<(active: boolean) => void>(() => {});
+  const syncVideoRef = useRef<() => void>(() => {});
 
   const getClampedTargetTime = (videoEl: HTMLVideoElement) => {
     const duration =
@@ -87,114 +93,101 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
     );
   };
 
-  const flushVideoSeek = (force = false) => {
-    const videoEl = videoRef.current;
-    if (!videoEl || isDestroyedRef.current || videoEl.readyState < 1) return;
-
-    const targetTime = getClampedTargetTime(videoEl);
-
-    if (!force && Math.abs(videoEl.currentTime - targetTime) < 0.018) {
-      isSeekingRef.current = false;
-      return;
-    }
-
-    if (videoEl.seeking || isSeekingRef.current) return;
-
-    isSeekingRef.current = true;
-    if (seekFallbackRef.current !== null) {
-      window.clearTimeout(seekFallbackRef.current);
-    }
-    seekFallbackRef.current = window.setTimeout(() => {
-      isSeekingRef.current = false;
-      const latestEl = videoRef.current;
-      if (!latestEl || isDestroyedRef.current || latestEl.readyState < 1 || latestEl.seeking) {
-        return;
-      }
-      const latestTarget = getClampedTargetTime(latestEl);
-      if (Math.abs(latestEl.currentTime - latestTarget) > 0.025) {
-        flushVideoSeek(true);
-      }
-    }, 420);
-
-    try {
-      videoEl.currentTime = targetTime;
-    } catch {
-      isSeekingRef.current = false;
+  const cancelPendingSeek = () => {
+    if (pendingSeekRef.current !== null) {
+      window.clearTimeout(pendingSeekRef.current);
+      pendingSeekRef.current = null;
     }
   };
 
-  const primeVideoDecoder = () => {
-    const videoEl = videoRef.current;
-    if (!videoEl || hasPrimedRef.current || isDestroyedRef.current) return;
-    if (videoEl.readyState < 2) return;
-    hasPrimedRef.current = true;
-
-    const playPromise = videoEl.play();
-    if (playPromise && typeof playPromise.then === 'function') {
-      playPromise
-        .then(() => {
-          if (isDestroyedRef.current) return;
-          videoEl.pause();
-          isSeekingRef.current = false;
-          flushVideoSeek(true);
-        })
-        .catch(() => {
-          // Autoplay priming blocked; direct seeking still updates frames
-        });
-    } else {
-      videoEl.pause();
+  const setSceneVisible = (visible: boolean) => {
+    if (isSceneVisibleRef.current === visible) return;
+    isSceneVisibleRef.current = visible;
+    sectionRef.current?.toggleAttribute('data-tears-visible', visible);
+    if (!visible) {
+      cancelPendingSeek();
+      videoRef.current?.pause();
     }
+  };
+
+  const setEffectsActive = (active: boolean) => {
+    if (isSectionActiveRef.current === active) return;
+    isSectionActiveRef.current = active;
+    syncEffectsRef.current(active);
   };
 
   useEffect(() => {
-    isDestroyedRef.current = false;
-    hasPrimedRef.current = false;
     const videoEl = videoRef.current;
     if (!videoEl) return;
 
-    videoEl.muted = true;
-    videoEl.pause();
+    const touchInput = window.matchMedia('(pointer: coarse)');
+    let lastSeekAt = -Infinity;
+    let hasPrimed = false;
+    let disposed = false;
 
-    const syncDecodedFrame = () => {
-      if (isDestroyedRef.current) return;
-      videoEl.pause();
-      flushVideoSeek(true);
-    };
-
-    const handleSeeked = () => {
-      if (seekFallbackRef.current !== null) {
-        window.clearTimeout(seekFallbackRef.current);
-        seekFallbackRef.current = null;
+    const flushVideoSeek = () => {
+      if (disposed || !isSceneVisibleRef.current || videoEl.readyState < 1 || videoEl.seeking) {
+        return;
       }
-      isSeekingRef.current = false;
 
-      if (isDestroyedRef.current) return;
       const targetTime = getClampedTargetTime(videoEl);
-      if (Math.abs(videoEl.currentTime - targetTime) > 0.022) {
-        flushVideoSeek();
+      if (Math.abs(videoEl.currentTime - targetTime) < 0.018) return;
+
+      const now = performance.now();
+      const remaining = TOUCH_SEEK_INTERVAL_MS - (now - lastSeekAt);
+      if (touchInput.matches && remaining > 0) {
+        if (pendingSeekRef.current === null) {
+          pendingSeekRef.current = window.setTimeout(() => {
+            pendingSeekRef.current = null;
+            flushVideoSeek();
+          }, remaining);
+        }
+        return;
+      }
+
+      cancelPendingSeek();
+      try {
+        videoEl.currentTime = targetTime;
+        lastSeekAt = now;
+      } catch {
+        // The next timeline update or media readiness event can retry.
       }
     };
 
-    videoEl.addEventListener('loadedmetadata', syncDecodedFrame);
-    videoEl.addEventListener('loadeddata', syncDecodedFrame);
-    videoEl.addEventListener('canplay', syncDecodedFrame);
-    videoEl.addEventListener('seeked', handleSeeked);
+    const syncVideo = () => {
+      if (!isSceneVisibleRef.current) return;
+      if (videoEl.preload !== 'auto') videoEl.preload = 'auto';
+      if (!hasPrimed && desiredProgressRef.current > 0.01 && videoEl.readyState >= 2) {
+        hasPrimed = true;
+        videoEl.play()
+          .then(() => {
+            if (disposed) return;
+            videoEl.pause();
+            flushVideoSeek();
+          })
+          .catch(() => {
+            // Direct seeking still works if the browser blocks playback.
+          });
+      }
+      flushVideoSeek();
+    };
 
-    if (videoEl.readyState === 0) {
-      videoEl.load();
-    } else {
-      syncDecodedFrame();
-    }
+    syncVideoRef.current = syncVideo;
+    videoEl.addEventListener('loadedmetadata', syncVideo);
+    videoEl.addEventListener('loadeddata', syncVideo);
+    videoEl.addEventListener('canplay', syncVideo);
+    videoEl.addEventListener('seeked', syncVideo);
+    syncVideo();
 
     return () => {
-      isDestroyedRef.current = true;
-      if (seekFallbackRef.current !== null) {
-        window.clearTimeout(seekFallbackRef.current);
-      }
-      videoEl.removeEventListener('loadedmetadata', syncDecodedFrame);
-      videoEl.removeEventListener('loadeddata', syncDecodedFrame);
-      videoEl.removeEventListener('canplay', syncDecodedFrame);
-      videoEl.removeEventListener('seeked', handleSeeked);
+      disposed = true;
+      cancelPendingSeek();
+      videoEl.pause();
+      syncVideoRef.current = () => {};
+      videoEl.removeEventListener('loadedmetadata', syncVideo);
+      videoEl.removeEventListener('loadeddata', syncVideo);
+      videoEl.removeEventListener('canplay', syncVideo);
+      videoEl.removeEventListener('seeked', syncVideo);
     };
   }, []);
 
@@ -203,25 +196,29 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
     const mm = gsap.matchMedia();
 
     mm.add('(prefers-reduced-motion: no-preference)', () => {
+      let cameraTween: gsap.core.Tween | undefined;
+      let emberTween: gsap.core.Tween | undefined;
       const ctx = gsap.context(() => {
         if (mediaWrapRef.current) {
-          gsap.to(mediaWrapRef.current, {
+          cameraTween = gsap.to(mediaWrapRef.current, {
             scale: 1.055,
             duration: 16,
             ease: 'sine.inOut',
             repeat: -1,
             yoyo: true,
+            paused: true,
           });
         }
 
         if (emberGlowRef.current) {
-          gsap.to(emberGlowRef.current, {
+          emberTween = gsap.to(emberGlowRef.current, {
             opacity: 0.85,
             scale: 1.08,
             duration: 4.5,
             ease: 'sine.inOut',
             repeat: -1,
             yoyo: true,
+            paused: true,
           });
         }
       }, sectionRef);
@@ -237,11 +234,7 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
         Math.random() * (max - min) + min;
 
       const triggerGlitchBurst = () => {
-        if (isUnmounted) return;
-        if (!isSectionActiveRef.current) {
-          glitchDelayCall = gsap.delayedCall(0.8, triggerGlitchBurst);
-          return;
-        }
+        if (isUnmounted || !isSectionActiveRef.current) return;
 
         const slice1Top = Math.round(randRange(10, 32));
         const slice1Bottom = Math.round(100 - slice1Top - randRange(4, 11));
@@ -252,7 +245,8 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
 
         const glitchTl = gsap.timeline({
           onComplete: () => {
-            if (!isUnmounted) {
+            activeGlitchTl = undefined;
+            if (!isUnmounted && isSectionActiveRef.current) {
               glitchDelayCall = gsap.delayedCall(
                 randRange(2.8, 6.2),
                 triggerGlitchBurst
@@ -335,18 +329,15 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
       };
 
       const triggerAnalogArtifact = () => {
-        if (isUnmounted) return;
-        if (!isSectionActiveRef.current) {
-          analogDelayCall = gsap.delayedCall(0.8, triggerAnalogArtifact);
-          return;
-        }
+        if (isUnmounted || !isSectionActiveRef.current) return;
 
         const scratchLeft1 = Math.round(randRange(14, 86));
         const scratchLeft2 = Math.round(randRange(18, 82));
 
         const analogTl = gsap.timeline({
           onComplete: () => {
-            if (!isUnmounted) {
+            activeAnalogTl = undefined;
+            if (!isUnmounted && isSectionActiveRef.current) {
               analogDelayCall = gsap.delayedCall(
                 randRange(1.4, 3.8),
                 triggerAnalogArtifact
@@ -396,8 +387,25 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
         }
       };
 
-      glitchDelayCall = gsap.delayedCall(1.2, triggerGlitchBurst);
-      analogDelayCall = gsap.delayedCall(0.9, triggerAnalogArtifact);
+      const syncEffects = (active: boolean) => {
+        if (active) {
+          cameraTween?.resume();
+          emberTween?.resume();
+          glitchDelayCall = gsap.delayedCall(1.2, triggerGlitchBurst);
+          analogDelayCall = gsap.delayedCall(0.9, triggerAnalogArtifact);
+        } else {
+          cameraTween?.pause();
+          emberTween?.pause();
+          glitchDelayCall?.kill();
+          analogDelayCall?.kill();
+          activeGlitchTl?.revert();
+          activeAnalogTl?.revert();
+          activeGlitchTl = undefined;
+          activeAnalogTl = undefined;
+        }
+      };
+      syncEffectsRef.current = syncEffects;
+      syncEffects(isSectionActiveRef.current);
 
       if (
         window.matchMedia('(pointer: fine)').matches &&
@@ -440,10 +448,8 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
 
       return () => {
         isUnmounted = true;
-        glitchDelayCall?.kill();
-        activeGlitchTl?.kill();
-        analogDelayCall?.kill();
-        activeAnalogTl?.kill();
+        syncEffects(false);
+        syncEffectsRef.current = () => {};
         removeMouseListener?.();
         ctx.revert();
       };
@@ -483,6 +489,12 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
             gsap.set(chars, { opacity: 0.1 });
           }
         });
+
+        // Begin buffering during the completed portrait's reading beat.
+        tl.call(() => {
+          const videoEl = videoRef.current;
+          if (videoEl) videoEl.preload = 'auto';
+        }, [], Math.max(0, startAt - 1.4));
 
         // 1. Reveal section & open narrow 100%-wide horizontal center slit over motionless About Me
         tl.to(
@@ -611,7 +623,7 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
           );
         }
 
-        // 3. Scrub video strictly in sync with scroll across [startAt .. startAt + 10]
+        // Keep the final frame visible through the reading beat and fade.
         const scrubProxy = { progress: 0 };
         let wasFullscreen = false;
 
@@ -619,17 +631,19 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
           scrubProxy,
           {
             progress: 1,
-            duration: TEARS_TIMELINE_DURATION,
+            duration: TEARS_SCENE_DURATION,
             ease: 'none',
             onUpdate: () => {
-              const p = Math.max(0, Math.min(1, scrubProxy.progress));
+              const elapsed = scrubProxy.progress * TEARS_SCENE_DURATION;
+              const p = Math.max(0, Math.min(1, elapsed / TEARS_TIMELINE_DURATION));
               desiredProgressRef.current = p;
-              const nowActive = p > 0.01;
-              if (nowActive && !hasPrimedRef.current) {
-                primeVideoDecoder();
-              }
-              isSectionActiveRef.current = nowActive;
-              flushVideoSeek();
+              const visible =
+                scrubProxy.progress > 0 &&
+                scrubProxy.progress < 1 &&
+                (hooks?.isStageVisible?.() ?? true);
+              setSceneVisible(visible);
+              setEffectsActive(visible && p > 0.01);
+              if (visible) syncVideoRef.current();
 
               const isNowFullscreen = p >= 0.168;
               if (isNowFullscreen && !wasFullscreen) {
@@ -645,21 +659,22 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
         );
 
         // 4. Brief reading beat on "Time to die." + tribute, then fade out to solid #0C121B before My Works
-        tl.to({}, { duration: 0.45 }, startAt + TEARS_TIMELINE_DURATION)
+        tl.to({}, { duration: TEARS_HOLD_DURATION }, startAt + TEARS_TIMELINE_DURATION)
           .to(
             [slitEl, textLayerEl],
             {
               opacity: 0,
-              duration: 0.95,
+              duration: TEARS_FADE_DURATION,
               ease: 'power2.inOut',
               immediateRender: false,
             },
-            startAt + TEARS_TIMELINE_DURATION + 0.45
+            startAt + TEARS_TIMELINE_DURATION + TEARS_HOLD_DURATION
           );
 
         return () => {
           wasFullscreen = false;
-          isSectionActiveRef.current = false;
+          setSceneVisible(false);
+          setEffectsActive(false);
         };
       },
     }),
@@ -707,7 +722,7 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
                   src={TEARS_VIDEO_SRC}
                   muted
                   playsInline
-                  preload="auto"
+                  preload="metadata"
                   aria-label="빗속에서 독백하는 영화 블레이드 러너 로이 배티 장면"
                   className="w-full h-full object-cover object-[50%_47%] scale-[1.28] md:scale-[1.32] sepia-[0.16] saturate-[0.84] contrast-[1.12] brightness-[0.88] pointer-events-none select-none will-change-transform"
                 />
@@ -826,7 +841,7 @@ export default function TearsInRainSection({ ref }: TearsInRainSectionProps) {
                       <span
                         key={`${wIdx}-${cIdx}`}
                         data-tears-char
-                        className="inline-block will-change-[opacity]"
+                        className="inline-block"
                       >
                         {ch}
                       </span>

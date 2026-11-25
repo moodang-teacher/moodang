@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import HanjaArtwork from './HanjaArtwork';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -105,6 +106,7 @@ export default function WorksSection() {
             duration: baseDuration,
             ease: 'none',
             repeat: -1,
+            paused: true,
           });
           trackTweens.push(tween);
 
@@ -133,11 +135,16 @@ export default function WorksSection() {
           });
         };
 
+        const syncTracks = (visible: boolean) => {
+          trackTweens.forEach((tween) => tween.paused(!visible));
+        };
+
         const scrollBoostTrigger = ScrollTrigger.create({
           trigger: sectionEl,
           start: 'top bottom',
           end: 'bottom top',
           refreshPriority: 30,
+          onToggle: (self) => syncTracks(self.isActive),
           onUpdate: (self) => {
             const absVelocity = Math.min(2600, Math.abs(self.getVelocity()));
             if (absVelocity < 35) return;
@@ -155,6 +162,7 @@ export default function WorksSection() {
             });
           },
         });
+        syncTracks(scrollBoostTrigger.isActive);
 
         return () => {
           velocityDecay?.kill();
@@ -200,16 +208,15 @@ export default function WorksSection() {
         </p>
         <h2
           data-works-reveal
-          className="mt-2 font-display text-[clamp(2.2rem,4.4vw,3.65rem)] font-bold tracking-[-0.03em] leading-none text-[#EAE5DC]"
+          className="mt-2 font-display section-title font-bold tracking-[-0.03em] leading-none text-[#EAE5DC]"
         >
           my works<span className="text-[#A52A43]">.</span>
         </h2>
-        <p
+        <HanjaArtwork
+          artwork="works"
           data-works-reveal
-          className="mt-6 font-brush text-[8.5vw] sm:text-[6vw] md:text-[clamp(2.75rem,4.6vw,6.25rem)] font-normal tracking-[0.08em] leading-none whitespace-nowrap text-[#A52A43] drop-shadow-[0_10px_30px_rgba(12,18,27,0.9)]"
-        >
-          實戰記錄
-        </p>
+          className="drop-shadow-[0_10px_30px_rgba(12,18,27,0.9)]"
+        />
       </div>
 
       {/* Right-Tilted Diagonal Marquee Streams (Right -> Left) */}

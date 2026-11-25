@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
+import HanjaArtwork from './HanjaArtwork';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -521,7 +522,7 @@ export default function EpilogueSection() {
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-[#090C11] px-6 text-center">
-            <p className="font-brush text-5xl text-[#A52A43]/60">勇往直前</p>
+            <HanjaArtwork artwork="epilogue" compact className="opacity-60" />
             <p className="mt-3 font-display text-xs tracking-[0.22em] text-[#9E988C]/50">
               QUINTUS HORATIUS FLACCUS
             </p>
@@ -547,16 +548,15 @@ export default function EpilogueSection() {
           </p>
           <h2
             data-epilogue-head
-            className="mt-2 font-display text-[clamp(2.2rem,4.4vw,3.65rem)] font-bold tracking-[-0.03em] leading-none text-[#EAE5DC]"
+            className="mt-2 font-display section-title font-bold tracking-[-0.03em] leading-none text-[#EAE5DC]"
           >
             epilogue<span className="text-[#A52A43]">.</span>
           </h2>
-          <p
+          <HanjaArtwork
+            artwork="epilogue"
             data-epilogue-head
-            className="mt-6 font-brush text-[8.5vw] sm:text-[6vw] md:text-[clamp(2.75rem,4.6vw,6.25rem)] font-normal tracking-[0.08em] leading-none whitespace-nowrap text-[#A52A43] drop-shadow-[0_10px_30px_rgba(5,7,10,0.95)]"
-          >
-            勇往直前
-          </p>
+            className="drop-shadow-[0_10px_30px_rgba(5,7,10,0.95)]"
+          />
         </div>
 
         {/* Monumental Left 2/3 Quote & Subtle Latin Original */}

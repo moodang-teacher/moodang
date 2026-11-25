@@ -6,6 +6,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import { ArrowLeft, ArrowRight, ArrowUpRight, X } from 'lucide-react';
+import HanjaArtwork from './HanjaArtwork';
 import {
   fetchPortfolioWorks,
   type StudentWork,
@@ -1060,12 +1061,10 @@ export default function PortfolioSection() {
             <p className="text-xs sm:text-[13px] font-medium tracking-[0.2em] text-[#0C121B]/55">
               모두 내 아픈 손가락
             </p>
-            <h2 className="mt-2 font-display text-[clamp(2.3rem,4.5vw,3.75rem)] font-bold tracking-[-0.03em] leading-none text-[#0C121B]">
+            <h2 className="mt-2 font-display section-title [--section-title-size:clamp(2.3rem,4.5vw,3.75rem)] font-bold tracking-[-0.03em] leading-none text-[#0C121B]">
               portfolio<span className="text-[#A52A43]">.</span>
             </h2>
-            <p className="mt-6 font-brush text-[8.5vw] sm:text-[6vw] md:text-[clamp(2.75rem,4.6vw,6.25rem)] font-normal tracking-[0.08em] leading-none whitespace-nowrap text-[#A52A43]">
-              靑出於藍
-            </p>
+            <HanjaArtwork artwork="portfolio" />
           </div>
 
           {/* Left Open-Zone Editorial Quote & Always-Accessible External Button (Blue Box Zone) */}
@@ -1138,12 +1137,10 @@ export default function PortfolioSection() {
               <p className="text-xs font-medium tracking-[0.2em] text-[#0C121B]/55">
                 모두 내 아픈 손가락
               </p>
-              <h2 className="mt-2 font-display text-4xl sm:text-5xl font-bold tracking-[-0.03em] text-[#0C121B]">
+              <h2 className="mt-2 font-display section-title [--section-title-size:2.25rem] sm:[--section-title-size:3rem] font-bold tracking-[-0.03em] text-[#0C121B]">
                 portfolio<span className="text-[#A52A43]">.</span>
               </h2>
-              <p className="mt-6 font-brush text-5xl sm:text-6xl text-[#A52A43]">
-                靑出於藍
-              </p>
+              <HanjaArtwork artwork="portfolio" compact className="mt-6" />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

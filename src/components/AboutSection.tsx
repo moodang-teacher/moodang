@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Matter from 'matter-js';
+import HanjaArtwork from './HanjaArtwork';
 import TearsInRainSection, { type TearsInRainHandle } from './TearsInRainSection';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -27,11 +28,11 @@ const CAREER_ITEMS = [
   '서울과학기술대학교 공업디자인',
 ];
 
-const STATS = [
-  { value: '20', unit: 'years.', label: '실무경력' },
-  { value: '14', unit: 'years.', label: '강의경력' },
-  { value: '4.8', unit: 'mark.', label: '강의만족도' },
-];
+const CAREER_BASE_YEAR = 2026;
+const koreaYear = new Intl.DateTimeFormat('en', {
+  timeZone: 'Asia/Seoul',
+  year: 'numeric',
+});
 
 interface BottleMeta {
   body: Matter.Body;
@@ -85,6 +86,13 @@ function buildGradedBottleSprite(img: HTMLImageElement): HTMLCanvasElement {
 }
 
 export default function AboutSection() {
+  const additionalYears = Number(koreaYear.format(new Date())) - CAREER_BASE_YEAR;
+  const stats = [
+    { value: 18 + additionalYears, unit: 'years.', label: '실무경력' },
+    { value: 16 + additionalYears, unit: 'years.', label: '강의경력' },
+    { value: 4.8, unit: 'mark.', label: '강의만족도' },
+  ];
+
   const stageRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const tearsHandleRef = useRef<TearsInRainHandle>(null);
@@ -145,9 +153,11 @@ export default function AboutSection() {
     let spawnTimerIds: number[] = [];
     let resizeDebounceId: number | null = null;
     let portraitTimerId: number | null = null;
+    let portraitTween: gsap.core.Tween | undefined;
     let currentPortraitIndex = 0;
     let isSimulationActive = false;
-    let hasTriggeredCurrentVisit = false;
+    let isAboutPinned = false;
+    let isMakgeolliVisible = false;
     let lastSpawnWidth = width;
     let isDestroyed = false;
 
@@ -165,12 +175,17 @@ export default function AboutSection() {
 
     const syncCanvasSize = () => {
       const { nextWidth, nextHeight } = getViewportSize();
+      const nextDpr = Math.min(window.devicePixelRatio || 1, 2);
+      const pixelWidth = Math.round(nextWidth * nextDpr);
+      const pixelHeight = Math.round(nextHeight * nextDpr);
+      const changed = width !== nextWidth || height !== nextHeight || dpr !== nextDpr;
       width = nextWidth;
       height = nextHeight;
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = nextDpr;
 
-      canvasEl.width = Math.round(width * dpr);
-      canvasEl.height = Math.round(height * dpr);
+      if (canvasEl.width !== pixelWidth) canvasEl.width = pixelWidth;
+      if (canvasEl.height !== pixelHeight) canvasEl.height = pixelHeight;
+      return changed;
     };
 
     const rebuildBoundaries = () => {
@@ -351,6 +366,7 @@ export default function AboutSection() {
 
     const startPortraitLoop = () => {
       if (portraitTimerId !== null) return;
+      portraitTween?.resume();
       applyPortraitFrame(currentPortraitIndex);
       portraitTimerId = window.setInterval(() => {
         if (isDestroyed) return;
@@ -360,6 +376,7 @@ export default function AboutSection() {
     };
 
     const stopPortraitLoop = () => {
+      portraitTween?.pause();
       if (portraitTimerId !== null) {
         window.clearInterval(portraitTimerId);
         portraitTimerId = null;
@@ -367,9 +384,7 @@ export default function AboutSection() {
     };
 
     const triggerMakgeolliAvalanche = () => {
-      if (isDestroyed || !spriteCanvas) return;
-      syncCanvasSize();
-      rebuildBoundaries();
+      if (isDestroyed || !isMakgeolliVisible || !spriteCanvas) return;
       clearBottles();
       startLoop();
 
@@ -427,7 +442,7 @@ export default function AboutSection() {
       if (isDestroyed) return;
       const prevWidth = width;
       const prevHeight = height;
-      syncCanvasSize();
+      if (!syncCanvasSize()) return;
       rebuildBoundaries();
 
       if (bottles.length > 0 && prevWidth > 0 && prevHeight > 0) {
@@ -445,39 +460,24 @@ export default function AboutSection() {
         }
       }
 
-      drawFrame();
+      if (isMakgeolliVisible) drawFrame();
+
+      if (width === prevWidth) return;
 
       if (resizeDebounceId !== null) {
         window.clearTimeout(resizeDebounceId);
       }
 
       resizeDebounceId = window.setTimeout(() => {
-        if (isDestroyed) return;
-        ScrollTrigger.refresh();
-
-        if (
-          !window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
-          hasTriggeredCurrentVisit &&
-          Math.abs(width - lastSpawnWidth) > 70
-        ) {
+        resizeDebounceId = null;
+        if (Math.abs(width - lastSpawnWidth) > 70) {
           triggerMakgeolliAvalanche();
         }
       }, 160);
     };
 
     window.addEventListener('resize', handleViewportAdapt);
-    const resizeObserver = new ResizeObserver(() => {
-      handleViewportAdapt();
-    });
-    resizeObserver.observe(document.documentElement);
-
-    const handleScrollTriggerRefresh = () => {
-      if (isDestroyed) return;
-      syncCanvasSize();
-      rebuildBoundaries();
-      drawFrame();
-    };
-    ScrollTrigger.addEventListener('refresh', handleScrollTriggerRefresh);
+    ScrollTrigger.addEventListener('refresh', handleViewportAdapt);
 
     const img = new Image();
     img.src = MAKGEOLLI_IMG_SRC;
@@ -486,11 +486,7 @@ export default function AboutSection() {
       bottleAspect = img.naturalWidth / Math.max(1, img.naturalHeight);
       spriteCanvas = buildGradedBottleSprite(img);
 
-      if (
-        !window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
-        hasTriggeredCurrentVisit &&
-        bottles.length === 0
-      ) {
+      if (bottles.length === 0) {
         triggerMakgeolliAvalanche();
       }
     };
@@ -501,6 +497,24 @@ export default function AboutSection() {
       const ctx = gsap.context(() => {
         const revealItems = aboutContentEl.querySelectorAll('[data-about-reveal]');
         let isCoveredByTears = false;
+        const makgeolliFadeStart = 1.45;
+        const makgeolliFadeDuration = 1.05;
+
+        const syncMakgeolli = (time: number) => {
+          const visible = isAboutPinned && time < makgeolliFadeStart + makgeolliFadeDuration;
+          if (visible === isMakgeolliVisible) return;
+          isMakgeolliVisible = visible;
+          if (!visible) {
+            stopLoop();
+          } else if (
+            spriteCanvas &&
+            (bottles.length === 0 || Math.abs(width - lastSpawnWidth) > 70)
+          ) {
+            triggerMakgeolliAvalanche();
+          } else {
+            startLoop();
+          }
+        };
 
         // Stay invisible behind Prolog without visibility: hidden so descendant video preloads cleanly
         gsap.set(stageEl, { opacity: 0, pointerEvents: 'none' });
@@ -512,12 +526,13 @@ export default function AboutSection() {
 
         // Subtle continuous camera breathing on the living portrait backdrop
         if (portraitMotionRef.current) {
-          gsap.to(portraitMotionRef.current, {
+          portraitTween = gsap.to(portraitMotionRef.current, {
             scale: 1.055,
             duration: 14,
             ease: 'sine.inOut',
             repeat: -1,
             yoyo: true,
+            paused: true,
           });
         }
 
@@ -531,34 +546,32 @@ export default function AboutSection() {
             scrub: 0.65,
             invalidateOnRefresh: true,
             refreshPriority: 40,
-            onEnter: () => {
+            onEnter: (self) => {
               gsap.set(stageEl, { opacity: 1, pointerEvents: 'auto' });
-              hasTriggeredCurrentVisit = true;
-              if (spriteCanvas && bottles.length === 0) {
-                triggerMakgeolliAvalanche();
-              } else {
-                startLoop();
-              }
+              isAboutPinned = true;
+              syncMakgeolli(self.animation?.time() ?? 0);
               if (!isCoveredByTears) {
                 startPortraitLoop();
               }
             },
-            onEnterBack: () => {
+            onEnterBack: (self) => {
               gsap.set(stageEl, { opacity: 1, pointerEvents: 'auto' });
+              isAboutPinned = true;
+              syncMakgeolli(self.animation?.time() ?? 0);
               if (!isCoveredByTears) {
-                startLoop();
                 startPortraitLoop();
               }
             },
             onLeave: () => {
-              stopLoop();
+              isAboutPinned = false;
+              syncMakgeolli(0);
               stopPortraitLoop();
             },
             onLeaveBack: () => {
-              hasTriggeredCurrentVisit = false;
               isCoveredByTears = false;
+              isAboutPinned = false;
               gsap.set(stageEl, { opacity: 0, pointerEvents: 'none' });
-              stopLoop();
+              syncMakgeolli(0);
               stopPortraitLoop();
               clearBottles();
               drawFrame();
@@ -567,17 +580,17 @@ export default function AboutSection() {
         });
 
         // Beat 1: Hold Makgeolli B-movie avalanche on screen while bottles fall & pile
-        aboutTl.to({}, { duration: 1.45 });
+        aboutTl.to({}, { duration: makgeolliFadeStart });
 
         // Beat 2: Fade out Makgeolli layer while cross-dissolving in the living portrait + About Me contents
         aboutTl.to(
           makgeolliLayerEl,
           {
             autoAlpha: 0,
-            duration: 1.05,
+            duration: makgeolliFadeDuration,
             ease: 'power2.inOut',
           },
-          1.45
+          makgeolliFadeStart
         );
 
         aboutTl.to(
@@ -612,16 +625,23 @@ export default function AboutSection() {
           aboutTl,
           tearsStart,
           {
+            isStageVisible: () => {
+              const trigger = aboutTl.scrollTrigger;
+              if (!trigger) return false;
+              const scroll = trigger.scroll();
+              return scroll >= trigger.start && scroll < trigger.end + height;
+            },
             onFullscreenEnter: () => {
               isCoveredByTears = true;
               stopPortraitLoop();
             },
             onFullscreenLeaveBack: () => {
               isCoveredByTears = false;
-              startPortraitLoop();
+              if (isAboutPinned) startPortraitLoop();
             },
           }
         );
+        aboutTl.eventCallback('onUpdate', () => syncMakgeolli(aboutTl.time()));
 
         // Hero-matched intermittent SF glitch bursts & 35mm analog projector artifacts for P202 portraits
         let glitchDelayCall: gsap.core.Tween | undefined;
@@ -958,6 +978,9 @@ export default function AboutSection() {
         statGlitchDelayCall = gsap.delayedCall(1.4, triggerStatGlitch);
 
         return () => {
+          isAboutPinned = false;
+          syncMakgeolli(0);
+          stopPortraitLoop();
           tearsCleanup?.();
           glitchDelayCall?.kill();
           activeGlitchTl?.kill();
@@ -986,8 +1009,7 @@ export default function AboutSection() {
       if (resizeDebounceId !== null) {
         window.clearTimeout(resizeDebounceId);
       }
-      resizeObserver.disconnect();
-      ScrollTrigger.removeEventListener('refresh', handleScrollTriggerRefresh);
+      ScrollTrigger.removeEventListener('refresh', handleViewportAdapt);
       window.removeEventListener('resize', handleViewportAdapt);
       canvasEl.removeEventListener('click', handleCanvasClick);
       Matter.Composite.clear(engine.world, false);
@@ -1166,17 +1188,16 @@ export default function AboutSection() {
 
               <h2
                 data-about-reveal
-                className="mt-2 font-display text-[clamp(2.2rem,4.4vw,3.65rem)] font-bold tracking-[-0.03em] leading-none text-[#EAE5DC]"
+                className="mt-2 font-display section-title font-bold tracking-[-0.03em] leading-none text-[#EAE5DC]"
               >
                 about me<span className="text-[#A52A43]">.</span>
               </h2>
 
-              <p
+              <HanjaArtwork
+                artwork="about"
                 data-about-reveal
-                className="mt-6 font-brush text-[8.5vw] sm:text-[6vw] md:text-[clamp(2.75rem,4.6vw,6.25rem)] font-normal tracking-[0.08em] leading-none whitespace-nowrap text-[#A52A43] drop-shadow-[0_10px_30px_rgba(12,18,27,0.9)]"
-              >
-                百戰老將
-              </p>
+                className="drop-shadow-[0_10px_30px_rgba(12,18,27,0.9)]"
+              />
 
               <ul className="mt-6 md:mt-8 space-y-2 text-sm sm:text-[15px] md:text-base font-normal tracking-[-0.01em] text-[#D7D0C3]/90">
                 {CAREER_ITEMS.map((item) => (
@@ -1187,7 +1208,7 @@ export default function AboutSection() {
               </ul>
 
               <dl className="mt-8 md:mt-11 w-full max-w-[660px] grid grid-cols-3 gap-4 sm:gap-10">
-                {STATS.map((stat, index) => (
+                {stats.map((stat, index) => (
                   <div
                     key={stat.label}
                     data-about-reveal

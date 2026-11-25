@@ -20,7 +20,7 @@ export default function ContactFooter() {
           <p className="text-xs sm:text-[13px] font-medium tracking-[0.2em] text-[#D7D0C3]/55">
             드루와~ 드루와~
           </p>
-          <h2 className="mt-2 font-display text-[clamp(2.2rem,4.4vw,3.65rem)] font-bold tracking-[-0.03em] leading-none text-[#EAE5DC]">
+          <h2 className="mt-2 font-display section-title font-bold tracking-[-0.03em] leading-none text-[#EAE5DC]">
             contact<span className="text-[#A52A43]">.</span>
           </h2>
         </div>

@@ -34,7 +34,6 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
   const filmScratch2Ref = useRef<HTMLDivElement>(null);
   const parallaxMediaRef = useRef<HTMLDivElement>(null);
   const emberGlowRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const parallaxTextRef = useRef<HTMLDivElement>(null);
   const scrollWrapRef = useRef<HTMLDivElement>(null);
@@ -51,7 +50,7 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
       const ctx = gsap.context(() => {
         const logoPaths = svgLogoRef.current?.querySelectorAll('path');
         const words = sloganRef.current?.querySelectorAll('[data-slogan-word]');
-        const revealItems = contentRef.current?.querySelectorAll('[data-hero-reveal]');
+        const revealItems = sectionRef.current?.querySelectorAll('[data-hero-reveal]');
 
         // Initial hidden states before timeline starts
         gsap.set(portalStageRef.current, {
@@ -170,13 +169,13 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
             '<'
           );
 
-        // Phase 3: Eyebrow, SplitText headline character glide, quote & scroll cue entrance
-        const eyebrowEl = revealItems?.[0];
+        // Phase 3: Hanja artwork, headline character glide, quote & scroll cue entrance
+        const hanjaEl = revealItems?.[0];
         const quoteEl = revealItems?.[1];
 
-        if (eyebrowEl) {
+        if (hanjaEl) {
           tl.to(
-            eyebrowEl,
+            hanjaEl,
             {
               opacity: 1,
               y: 0,
@@ -198,7 +197,7 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
               stagger: 0.026,
               ease: 'power3.out',
             },
-            eyebrowEl ? '<+0.12' : '-=0.85'
+            hanjaEl ? '<+0.12' : '-=0.85'
           );
         }
 
@@ -691,6 +690,17 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
         />
       </div>
 
+      <div className="pointer-events-none absolute inset-y-[24.5%] left-0 z-[25] flex w-[40%] justify-center md:inset-y-[17.5%]">
+        <img
+          data-hero-reveal
+          src="/assets/hanja/hero.svg"
+          alt="巫堂先生"
+          width={464}
+          height={1334}
+          className="h-full w-auto max-w-full object-contain drop-shadow-[0_6px_24px_rgba(12,18,27,0.9)]"
+        />
+      </div>
+
       {/* Top Spacer for Centered Logo + Nav */}
       <div className="h-28 md:h-32 shrink-0" aria-hidden="true" />
 
@@ -700,14 +710,7 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
           ref={parallaxTextRef}
           className="w-full mx-auto text-center will-change-transform"
         >
-          <div ref={contentRef} className="w-full flex flex-col items-center text-center">
-            <p
-              data-hero-reveal
-              className="font-brush text-2xl sm:text-3xl md:text-4xl font-normal tracking-[0.22em] text-[#A52A43] mb-4 md:mb-5 drop-shadow-[0_6px_24px_rgba(12,18,27,0.9)]"
-            >
-              巫堂先生
-            </p>
-
+          <div className="flex w-full flex-col items-center pt-12 text-center sm:pt-[3.25rem] md:pt-[3.75rem]">
             <h1
               ref={headlineRef}
               className="font-display font-bold tracking-[-0.05em] leading-[0.95] text-[10.4vw] whitespace-nowrap select-none md:select-text drop-shadow-[0_12px_36px_rgba(12,18,27,0.92)]"

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import HanjaArtwork from './HanjaArtwork';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -303,17 +304,16 @@ export default function PrologSection() {
 
           <h2
             data-prolog-line
-            className="mt-2 font-display text-[clamp(2.2rem,4.4vw,3.65rem)] font-bold tracking-[-0.03em] leading-none text-[#EAE5DC]"
+            className="mt-2 font-display section-title font-bold tracking-[-0.03em] leading-none text-[#EAE5DC]"
           >
             prolog<span className="text-[#A52A43]">.</span>
           </h2>
 
-          <p
+          <HanjaArtwork
+            artwork="prolog"
             data-prolog-line
-            className="mt-6 font-brush text-[8.5vw] sm:text-[6vw] md:text-[clamp(2.75rem,4.6vw,6.25rem)] font-normal tracking-[0.08em] leading-none whitespace-nowrap text-[#A52A43] drop-shadow-[0_10px_30px_rgba(12,18,27,0.9)]"
-          >
-            一切唯心造
-          </p>
+            className="drop-shadow-[0_10px_30px_rgba(12,18,27,0.9)]"
+          />
 
           <p
             data-prolog-line
