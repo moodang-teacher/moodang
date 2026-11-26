@@ -312,7 +312,7 @@ export default function PrologSection() {
           <HanjaArtwork
             artwork="prolog"
             data-prolog-line
-            className="drop-shadow-[0_10px_30px_rgba(12,18,27,0.9)]"
+            className="[--section-hanja-width-scale:9.25] drop-shadow-[0_10px_30px_rgba(12,18,27,0.9)]"
           />
 
           <p

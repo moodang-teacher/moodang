@@ -121,7 +121,7 @@
 }
 
 .section-hanja {
-  width: min(100%, calc(var(--section-heading-size) * 5.75));
+  width: min(100%, calc(var(--section-heading-size) * var(--section-hanja-width-scale, 5.75)));
 }
 
 @keyframes film-grain-shift {
