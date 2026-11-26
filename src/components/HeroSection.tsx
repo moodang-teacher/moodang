@@ -44,9 +44,15 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
 
   useLayoutEffect(() => {
     const mm = gsap.matchMedia();
+    const heroEl = sectionRef.current;
+    let isHeroCovered = false;
+    let setEffectsCovered: ((covered: boolean) => void) | undefined;
 
     mm.add('(prefers-reduced-motion: no-preference)', () => {
       let headlineSplit: SplitText | null = null;
+      let breathingTween: gsap.core.Tween | undefined;
+      let glowTween: gsap.core.Tween | undefined;
+      let scrollCueTween: gsap.core.Tween | undefined;
 
       const ctx = gsap.context(() => {
         const logoPaths = svgLogoRef.current?.querySelectorAll('path');
@@ -234,34 +240,37 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
         // Continuous atmospheric life after intro completes
         tl.add(() => {
           if (mediaWrapRef.current) {
-            gsap.to(mediaWrapRef.current, {
+            breathingTween = gsap.to(mediaWrapRef.current, {
               scale: 1.055,
               duration: 16,
               ease: 'sine.inOut',
               repeat: -1,
               yoyo: true,
+              paused: isHeroCovered,
             });
           }
         });
 
         if (emberGlowRef.current) {
-          gsap.to(emberGlowRef.current, {
+          glowTween = gsap.to(emberGlowRef.current, {
             opacity: 0.85,
             scale: 1.08,
             duration: 4.5,
             ease: 'sine.inOut',
             repeat: -1,
             yoyo: true,
+            paused: isHeroCovered,
           });
         }
 
         if (scrollCueRef.current) {
-          gsap.to(scrollCueRef.current, {
+          scrollCueTween = gsap.to(scrollCueRef.current, {
             y: 7,
             duration: 1.5,
             ease: 'sine.inOut',
             repeat: -1,
             yoyo: true,
+            paused: isHeroCovered,
           });
         }
 
@@ -272,14 +281,10 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
       let glitchDelayCall: gsap.core.Tween | undefined;
       let activeGlitchTl: gsap.core.Timeline | undefined;
       let isUnmounted = false;
-      let isHeroCovered = false;
 
       const triggerGlitchBurst = () => {
-        if (isUnmounted) return;
-        if (isHeroCovered) {
-          glitchDelayCall = gsap.delayedCall(1.5, triggerGlitchBurst);
-          return;
-        }
+        glitchDelayCall = undefined;
+        if (isUnmounted || isHeroCovered) return;
 
         const randRange = (min: number, max: number) =>
           Math.random() * (max - min) + min;
@@ -293,7 +298,8 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
 
         const glitchTl = gsap.timeline({
           onComplete: () => {
-            if (!isUnmounted) {
+            activeGlitchTl = undefined;
+            if (!isUnmounted && !isHeroCovered) {
               glitchDelayCall = gsap.delayedCall(
                 randRange(2.8, 6.2),
                 triggerGlitchBurst
@@ -394,7 +400,8 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
       let activeAnalogTl: gsap.core.Timeline | undefined;
 
       const triggerAnalogArtifact = () => {
-        if (isUnmounted) return;
+        analogDelayCall = undefined;
+        if (isUnmounted || isHeroCovered) return;
 
         const randRange = (min: number, max: number) =>
           Math.random() * (max - min) + min;
@@ -404,7 +411,8 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
 
         const analogTl = gsap.timeline({
           onComplete: () => {
-            if (!isUnmounted) {
+            activeAnalogTl = undefined;
+            if (!isUnmounted && !isHeroCovered) {
               analogDelayCall = gsap.delayedCall(
                 randRange(1.4, 3.8),
                 triggerAnalogArtifact
@@ -457,19 +465,16 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
 
       analogDelayCall = gsap.delayedCall(2.4, triggerAnalogArtifact);
 
-      // Pause Hero video once Prolog finishes rising over Hero (top top), resume when scrolling back
-      const coverTrigger = ScrollTrigger.create({
-        trigger: '#prolog',
-        start: 'top top',
-        onEnter: () => {
-          isHeroCovered = true;
-          videoRef.current?.pause();
-        },
-        onLeaveBack: () => {
-          isHeroCovered = false;
-          videoRef.current?.play().catch(() => {});
-        },
-      });
+      setEffectsCovered = (covered) => {
+        breathingTween?.paused(covered);
+        glowTween?.paused(covered);
+        scrollCueTween?.paused(covered);
+        glitchDelayCall?.paused(covered);
+        activeGlitchTl?.paused(covered);
+        analogDelayCall?.paused(covered);
+        activeAnalogTl?.paused(covered);
+      };
+      setEffectsCovered(isHeroCovered);
 
       // Subtle cursor depth parallax on desktop
       if (
@@ -495,6 +500,7 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
         });
 
         const handleMouseMove = (e: MouseEvent) => {
+          if (isHeroCovered) return;
           const nx = e.clientX / window.innerWidth - 0.5;
           const ny = e.clientY / window.innerHeight - 0.5;
           mediaX(nx * -18);
@@ -512,7 +518,8 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
 
       return () => {
         isUnmounted = true;
-        coverTrigger.kill();
+        setEffectsCovered = undefined;
+        breathingTween?.kill();
         glitchDelayCall?.kill();
         activeGlitchTl?.kill();
         analogDelayCall?.kill();
@@ -527,7 +534,32 @@ export default function HeroSection({ onExplore }: HeroSectionProps) {
       gsap.set(preloaderRef.current, { display: 'none' });
     });
 
-    return () => mm.revert();
+    const setHeroCovered = (covered: boolean) => {
+      if (covered === isHeroCovered) return;
+      isHeroCovered = covered;
+      heroEl?.toggleAttribute('data-hero-covered', covered);
+      setEffectsCovered?.(covered);
+      if (covered) {
+        videoRef.current?.pause();
+      } else {
+        videoRef.current?.play().catch(() => {});
+      }
+    };
+    const syncCover = (trigger: ScrollTrigger) => setHeroCovered(trigger.scroll() >= trigger.start);
+    const coverTrigger = ScrollTrigger.create({
+      trigger: '#prolog',
+      start: 'top top',
+      onEnter: () => setHeroCovered(true),
+      onLeaveBack: () => setHeroCovered(false),
+      onRefresh: syncCover,
+    });
+    syncCover(coverTrigger);
+
+    return () => {
+      coverTrigger.kill();
+      heroEl?.removeAttribute('data-hero-covered');
+      mm.revert();
+    };
   }, []);
 
   return (

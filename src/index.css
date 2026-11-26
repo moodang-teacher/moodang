@@ -141,6 +141,7 @@
   will-change: transform;
 }
 
+#hero[data-hero-covered] .cinema-grain,
 #tears_in_rain:not([data-tears-visible]) .cinema-grain {
   animation-play-state: paused;
 }
