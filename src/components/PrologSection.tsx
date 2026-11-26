@@ -7,7 +7,6 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function PrologSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const topSealRef = useRef<HTMLDivElement>(null);
   const bgWallRef = useRef<HTMLDivElement>(null);
   const smoke1Ref = useRef<HTMLDivElement>(null);
   const smoke2Ref = useRef<HTMLDivElement>(null);
@@ -24,24 +23,6 @@ export default function PrologSection() {
 
         if (lines && lines.length > 0) {
           gsap.set(lines, { opacity: 0, y: 24 });
-        }
-
-        // Smoothly seal the transparent top feather with #0C121B right before pinning at top: 0
-        if (topSealRef.current) {
-          gsap.fromTo(
-            topSealRef.current,
-            { opacity: 0 },
-            {
-              opacity: 1,
-              ease: 'none',
-              scrollTrigger: {
-                trigger: sectionRef.current,
-                start: 'top 22%',
-                end: 'top top',
-                scrub: true,
-              },
-            }
-          );
         }
 
         // Background enters the screen smoothly as Prolog rises into view
@@ -209,13 +190,6 @@ export default function PrologSection() {
       ref={sectionRef}
       className="relative z-30 h-[var(--pinned-stage-height,100dvh)] w-full overflow-hidden text-[#D7D0C3]"
     >
-      {/* Solid #0C121B Seal: fades in right as Prolog docks at top: 0 so pinned view fully covers Hero */}
-      <div
-        ref={topSealRef}
-        aria-hidden="true"
-        className="absolute inset-0 z-0 bg-[#0C121B] opacity-0 pointer-events-none"
-      />
-
       {/* Confined Parallax Visual Stage with Soft Top Transparency Gradient */}
       <div className="prolog-top-feather absolute inset-0 z-[1] overflow-hidden bg-[#0C121B] pointer-events-none">
         {/* Background: prologue-skull-wall-end-frame.png slowly entering and scrolling right */}

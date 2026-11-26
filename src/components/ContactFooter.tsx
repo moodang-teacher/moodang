@@ -57,7 +57,8 @@ export default function ContactFooter() {
           </a>
 
           <p className="mt-4 sm:mt-5 text-[15.5px] sm:text-[17px] font-semibold tracking-[0.02em] text-[#A52A43]">
-            Google AI Studio와 Codex, 그리고 막걸리로 만들었습니다.
+            Google AI Studio와 Codex,{' '}
+            <span className="inline-block">그리고 막걸리로 만들었습니다.</span>
           </p>
         </div>
 

@@ -40,7 +40,6 @@
   }
 
   #prolog {
-    background-color: var(--color-main);
     min-height: var(--pinned-stage-height);
   }
 
